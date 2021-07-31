@@ -40,6 +40,7 @@ alt="node occ" width="240" height="180" border="10" /></a>
 -   features ( draftAngle)
 -   solid properties ( faces, edges, vertices, area , volume )
 -   import export ( STEP BREP )
+-   
 
 ### sample web application
 
@@ -48,7 +49,7 @@ alt="node occ" width="240" height="180" border="10" /></a>
 ## installing node-occ from npm
 
 ```
-$npm install node-occ
+$npm install @tsaspc/node-occ
 ```
 
 ## building node-occ from source : prerequisites
@@ -57,14 +58,11 @@ $npm install node-occ
 #### on (linux Ubuntu
 
 (use nodejs 12 or 14)
+# Prerequisites 
+Node.JS
 
 ```bash
-# installing nodejs and gyp utility to build extensions
-sudo apt-get install nodejs npm
-sudo npm install node-pre-gyp -g
-sudo npm install mocha@7 -g
-
-#installing cmake
+#CMake
 sudo apt-get install cmake cmake-curses-gui g++ build-essential libtbb2
 
 # ------------------------------------
@@ -83,15 +81,15 @@ npm install --build-from-source
 make test
 ```
 
-### on windows
+### On windows (Not Maintained)
 
 -   follow the tutorial in the [wiki](https://github.com/erossignon/node-occ/wiki)
 
-## dependencies:
+## Optional Dependencies:
 
 -   threejs : https://github.com/mrdoob/three.js
 
-## acknowledgement:
+## Acknowledgement:
 
 -   OpenCascade : http://www.opencascade.org
 -   occmodel : https://github.com/tenko/occmodel
@@ -99,6 +97,7 @@ make test
 
 ## MIT License
 
+Copyright © 2021 TSASPC LLC
 Copyright © 2012-2019 E. Rossignon
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
