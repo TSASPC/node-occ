@@ -155,6 +155,23 @@
 #include <BRep_ListIteratorOfListOfCurveRepresentation.hxx>
 #include <BRep_PolygonOnTriangulation.hxx>
 
+#include <RWGltf_CafWriter.hxx>
+#include <Message_ProgressRange.hxx>
+#include <TColStd_IndexedDataMapOfStringString.hxx>
+# include <TDocStd_Document.hxx>
+# include <XCAFApp_Application.hxx>
+# include <TDocStd_Document.hxx>
+# include <XCAFApp_Application.hxx>
+# include <XCAFDoc_DocumentTool.hxx>
+# include <XCAFDoc_ShapeTool.hxx>
+# include <XCAFDoc_ColorTool.hxx>
+# include <XCAFDoc_Location.hxx>
+# include <TDF_Label.hxx>
+# include <TDF_LabelSequence.hxx>
+# include <TDF_ChildIterator.hxx>
+# include <TDataStd_Name.hxx>
+# include <Quantity_Color.hxx>
+# include <Interface_Static.hxx>
 // Compatibility 6.5 and above
 #if (OCC_VERSION_MAJOR * 10 + OCC_VERSION_MINOR )  < 66
 

@@ -77,6 +77,7 @@ void Initialize(v8::Local<v8::Object> target)
     Nan::SetMethod(target,"writeBREP",     writeBREP);
     Nan::SetMethod(target,"readSTEP",      readSTEP);
     Nan::SetMethod(target,"readBREP",      readBREP);
+    Nan::SetMethod(target,"writeGLTF", writeGLTF);
 
     //xx Nan::SetMethod(target,"oceVersion",NanNew("0.13"));
     Nan::Set(target,Nan::New("oceVersion").ToLocalChecked(),  Nan::New("0.13").ToLocalChecked());

@@ -62,7 +62,7 @@
                       "library_dirs": [
                       ],
                       "include_dirs": [
-                      "/usr/include/opencascade",
+                      "/usr/local/include/opencascade",
                         "<!(node -e \"require('nan')\")"
                       ],}
               ],

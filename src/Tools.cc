@@ -259,7 +259,7 @@ public:
 };
 
 
-
+/*
 
 class MyProgressIndicator : public Message_ProgressIndicator
 {
@@ -273,8 +273,7 @@ public:
 };
 
 
-
-MyProgressIndicator::MyProgressIndicator(AsyncWorkerWithProgress* worker)
+MyProgressIndicator::Message_ProgressIndicator(AsyncWorkerWithProgress* worker)
   :Message_ProgressIndicator(), _worker(worker)
 {
   m_data = &_worker->m_data;
@@ -296,7 +295,7 @@ Standard_Boolean MyProgressIndicator::Show(const Standard_Boolean force)
   }
   return Standard_False;
 }
-
+*/
 
 
 
@@ -369,10 +368,10 @@ void StepAsyncReadWorker::Execute() {
   void* data = request.data;
   this->_retValue = 0;
 
-  occHandle(Message_ProgressIndicator) progress = new MyProgressIndicator(this);
+  //occHandle(Message_ProgressRange) progress = new MyProgressIndicator(this);
 
-  progress->SetScale(1, 100, 1);
-  progress->Show();
+  //progress->SetScale(1, 100, 1);
+  //progress->Show();
 
   try {
 
@@ -383,7 +382,7 @@ void StepAsyncReadWorker::Execute() {
     Interface_Static::SetIVal("read.step.nonmanifold",  1);
     Interface_Static::SetIVal("read.step.product.mode", 1);
 
-    progress->NewScope(5, "reading");
+    //progress->NewScope(5, "reading");
 
     if (aReader.ReadFile(_filename.c_str()) != IFSelect_RetDone) {
 
@@ -394,20 +393,20 @@ void StepAsyncReadWorker::Execute() {
       // Local<Value> argv[] = { Local<Value>(String::New())  };
       //  Local<Value>  res =  callback->Call(global, 1, argv);
       // NanReturnUndefined();
-      progress->EndScope();
-      progress->SetValue(105.0);
-      progress->Show();
+      //progress->EndScope();
+      //progress->SetValue(105.0);
+      //progress->Show();
       this->_retValue = 1;
       return;
 
     }
-    progress->EndScope();
-    progress->Show();
+    //progress->EndScope();
+    //progress->Show();
 
 
-    progress->NewScope(95, "transfert");
-    progress->Show();
-    aReader.WS()->MapReader()->SetProgress(progress);
+    //progress->NewScope(95, "transfert");
+    //progress->Show();
+    //aReader.WS()->MapReader()->SetProgress(progress);
 
 
     // Root transfers
@@ -416,7 +415,7 @@ void StepAsyncReadWorker::Execute() {
     Standard_Boolean failsonly = Standard_False;
     aReader.PrintCheckTransfer(failsonly, IFSelect_ItemsByEntity);
 
-    progress->SetRange(0, nbr);
+    //progress->SetRange(0, nbr);
     int mod = nbr / 10 + 1;
     for (int n = 1; n <= nbr; n++) {
 
@@ -426,14 +425,14 @@ void StepAsyncReadWorker::Execute() {
       if (!ok || nbs == 0) {
         continue; // skip empty root
       }
-      if ((n + 1) % mod == 0) { progress->Increment(); }
+      if ((n + 1) % mod == 0) { /*progress->Increment();*/ }
     }
 
-    aReader.WS()->MapReader()->SetProgress(0);
+    //aReader.WS()->MapReader()->SetProgress(0);
   
-    progress->SetValue(100);
-    progress->EndScope();
-    progress->Show(true);
+    //progress->SetValue(100);
+    //progress->EndScope();
+    //progress->Show();
 
     TopoDS_Shape aResShape;
     BRep_Builder B;
@@ -631,27 +630,27 @@ void BRepAsyncReadWorker::Execute()
   std::string filename = this->_filename;
 
   try {
-    occHandle(Message_ProgressIndicator) progress = new MyProgressIndicator(this);
-    progress->SetScale(1, 100, 1);
-    progress->Show();
+    //occHandle(Message_ProgressIndicator) progress = new MyProgressIndicator(this);
+    //progress->SetScale(1, 100, 1);
+    //progress->Show();
 
     // read brep-file
     TopoDS_Shape shape;
     BRep_Builder aBuilder;
-    if (!BRepTools::Read(shape, filename.c_str(), aBuilder, progress)) {
+    if (!BRepTools::Read(shape, filename.c_str(), aBuilder, Message_ProgressRange())) {
 
       std::stringstream str;
       str << "1- cannot read BREP file : '" << filename << "'" << std::ends;
       this->SetErrorMessage(str.str().c_str());
       this->_retValue = 1;
 
-      progress->SetValue(100.0);
-      progress->Show();
+      //progress->SetValue(100.0);
+      //progress->Show();
       return;
     }
     this->shapes.push_back(shape);
-    progress->SetValue(100.0);
-    progress->Show();
+    //progress->SetValue(100.0);
+    //progress->Show();
   }
   catch (...) {
     this->SetErrorMessage("2 ( caught C++ exception in _readBREPAsync");
@@ -693,4 +692,47 @@ NAN_METHOD(readBREP)
 }
 
 
+NAN_METHOD(writeGLTF)
+{
+  std::string filename;
+  if (!extractFileName(info[0], filename)) {
+    return Nan::ThrowError("expecting a file name");
+  }
 
+  std::list<Shape*>  shapes;
+  for (int i = 1; i < info.Length(); i++) {
+    extractShapes(info[i], shapes);
+  }
+
+  if (shapes.size() == 0) {
+    return info.GetReturnValue().Set(Nan::New<v8::Boolean>(false));
+  }
+
+  try {
+    TColStd_IndexedDataMapOfStringString aMetadata;
+
+    //occHandle(Message_ProgressIndicator) progress = new MyProgressIndicator(this);
+    occHandle(XCAFApp_Application) hApp = XCAFApp_Application::GetApplication();
+    occHandle(TDocStd_Document) hDoc;
+    hApp->NewDocument(TCollection_ExtendedString("MDTV-CAF"), hDoc);
+    occHandle(XCAFDoc_ShapeTool) myAssembly = XCAFDoc_DocumentTool::ShapeTool (hDoc->Main()); 
+    //TDF_Label aLabel = myAssembly->NewShape() 
+    RWGltf_CafWriter aWriter (filename.c_str(), filename.substr(filename.find_last_of(".") + 1)=="glb");
+    aWriter.SetTransformationFormat (RWGltf_WriterTrsfFormat_Compact);
+    // https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#coordinate-system-and-units
+    aWriter.ChangeCoordinateSystemConverter().SetInputLengthUnit (0.001);
+    aWriter.ChangeCoordinateSystemConverter().SetInputCoordinateSystem (RWMesh_CoordinateSystem_Zup);
+    Standard_Boolean makeAssembly = Standard_True; //default, if true, increases hierarchy size.
+    for (std::list<Shape*>::iterator it = shapes.begin(); it != shapes.end(); it++) {
+      TDF_Label aLabel = myAssembly->AddShape((*it)->shape(), makeAssembly); 
+    }
+    bool status = aWriter.Perform (hDoc, aMetadata, Message_ProgressRange());
+    if (!status) {
+
+        hApp->Close(hDoc);
+        return Nan::ThrowError("Failed to write GLTF");
+      }
+  } CATCH_AND_RETHROW("Failed to write GLTF");
+
+  info.GetReturnValue().Set(Nan::New<v8::Boolean>(true));
+}

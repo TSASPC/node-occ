@@ -4,7 +4,7 @@
 #
 ##########################################################################################
 
-export VERSION_FILE=/usr/include/opencascade/Standard_Version.hxx
+export VERSION_FILE=/usr/local/include/opencascade/Standard_Version.hxx
 grep -i "#define OCC_VERSION_COMPLETE"  ${VERSION_FILE} ;
 lscpu ;
 cmake --version ;

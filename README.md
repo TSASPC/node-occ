@@ -1,6 +1,22 @@
-# node-occ
+# @tsaspc/node-occ
 
 OpenCascade nodejs extension for solid modeling.
+
+---- NOTICE ------
+Module is being refactored for 7.5.0 Updates from OpenCASCADE Library
+
+Current Work:
+Rework Progress Indicators
+Add GLTF Export
+Add IGES Import/Export
+Add Surface fitting support
+Add NURBs support
+
+Long Term goal:
+
+Revamp to force XDE
+
+
 
 This nodejs extension provides _solid construction_ to nodejs.
 It provides a simple yet powerful javascript api to construct 3D geometry models.
@@ -13,7 +29,7 @@ This project comes with a set of V8 wrappers around OpenCascade API and a sample
 ### quick example
 
 ```javascript
-var occ = require("node-occ").occ;
+var occ = require("@tsaspc/node-occ").occ;
 
 // construct a box
 var box = occ.makeBox([0, 0, 0], [100, 100, 50]);
@@ -66,15 +82,11 @@ Node.JS
 sudo apt-get install cmake cmake-curses-gui g++ build-essential libtbb2
 
 # ------------------------------------
-git clone --recursive https://github.com/erossignon/node-occ.git
+git clone --recursive https://github.com/tsaspc/node-occ.git
 cd node-occ
 
-# download prebuild OpenCascade Library and header files
-bash ./prepare_node.sh
-
 #
-export OCCT_PACKAGE=occt-7.2.0
-export LD_LIBRARY_PATH=`pwd`/${OCCT_PACKAGE}/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 npm install --build-from-source
 
 # verify that everything is working OK
