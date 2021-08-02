@@ -720,7 +720,7 @@ NAN_METHOD(writeGLTF)
     RWGltf_CafWriter aWriter (filename.c_str(), filename.substr(filename.find_last_of(".") + 1)=="glb");
     aWriter.SetTransformationFormat (RWGltf_WriterTrsfFormat_Compact);
     // https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#coordinate-system-and-units
-    aWriter.ChangeCoordinateSystemConverter().SetInputLengthUnit (0.001);
+    aWriter.ChangeCoordinateSystemConverter().SetInputLengthUnit (1); //in MM
     aWriter.ChangeCoordinateSystemConverter().SetInputCoordinateSystem (RWMesh_CoordinateSystem_Zup);
     Standard_Boolean makeAssembly = Standard_True; //default, if true, increases hierarchy size.
     for (std::list<Shape*>::iterator it = shapes.begin(); it != shapes.end(); it++) {

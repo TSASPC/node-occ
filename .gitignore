@@ -58,3 +58,4 @@ occt-*
 .vscode
 
 bower_components
+package-lock.json
