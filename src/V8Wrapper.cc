@@ -80,10 +80,10 @@ void Initialize(v8::Local<v8::Object> target)
     Nan::SetMethod(target,"writeGLTF", writeGLTF);
 
     //xx Nan::SetMethod(target,"oceVersion",NanNew("0.13"));
-    Nan::Set(target,Nan::New("oceVersion").ToLocalChecked(),  Nan::New("0.13").ToLocalChecked());
+    Nan::Set(target,Nan::New("oceVersion").ToLocalChecked(),  Nan::New("1.0.1").ToLocalChecked());
 
     Nan::SetMethod(target,"gc",ForceGC); 
 
 
 }
-NODE_MODULE(occ, Initialize)
+NODE_MODULE(NODE_GYP_MODULE_NAME, Initialize)

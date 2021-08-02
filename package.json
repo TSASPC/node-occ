@@ -8,6 +8,7 @@
     "colors": "*",
     "gettemporaryfilepath": "1.0.1",
     "nan": "^2.14.1",
+    "node-gyp": "^8.1.0",
     "node-pre-gyp": "^0.15.0",
     "pace": "~0.0.4",
     "progress": "~2.0.3"
@@ -47,7 +48,7 @@
     "url": "https://github.com/tsaspc/node-occ.git"
   },
   "scripts": {
-    "install": "node-pre-gyp install --fallback-to-build",
+    "install": "node-gyp rebuild",
     "test": "mocha -R spec",
     "lint": "eslint lib test bin",
     "doc": "grunt doc",

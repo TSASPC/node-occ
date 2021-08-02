@@ -11,9 +11,7 @@
 #define Handle_was_defined
 #undef Handle
 #endif
-
 #include <v8.h>
-#include <node.h>
 #include <nan.h>
 
 #ifdef Handle_was_defined

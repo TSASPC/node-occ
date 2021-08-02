@@ -1,6 +1,6 @@
 all:
-	node-pre-gyp configure
-	node-pre-gyp build
+	node-gyp configure
+	node-gyp build
 	mocha
 
 .PHONY: test
@@ -8,13 +8,13 @@ test:
 	mocha
 
 clean:
-	node-pre-gyp clean
+	node-gyp clean
 
 packet:
-	npm install mocha@7
+	npm install mocha
 	npm install assert
 	npm install should
-	npm install node-pre-gyp		
+	npm install node-gyp		
 	
 
 copy: 

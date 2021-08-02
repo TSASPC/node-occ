@@ -6,6 +6,8 @@
   "targets": [
     {
       "target_name": "occ",
+      "cflags!": [ "-fno-exceptions" ],
+      "cflags_cc!": [ "-fno-exceptions" ],
          "conditions": [
               [
                 "OS=='mac'",
@@ -56,14 +58,18 @@
                         "-Wno-extra"
                       ],
                       "ldflags": [
-                        "-Wl,-rpath,\$$ORIGIN",
+                        "-Wl,-rpath,\$$ORIGIN"
                         ],
-
+                        'xcode_settings': {
+                          'OTHER_CPLUSPLUSFLAGS': ['-std=c++11', '-stdlib=libc++'],
+                        },
                       "library_dirs": [
+                      "/usr/local/lib",
                       ],
                       "include_dirs": [
+                      "/usr/local/include",
                       "/usr/local/include/opencascade",
-                        "<!(node -e \"require('nan')\")"
+                      "<!(node -e \"require('nan')\")"
                       ],}
               ],
               [
@@ -87,7 +93,7 @@
       "sources": [
         "src/all.cc"
       ],
-      "_sources": [
+      "sources_": [
         "src/Base.h",
         "src/Base.cc",
         "src/BooleanOperation.h",
@@ -134,59 +140,78 @@
         "OCE_HAVE_CLIMITS"
       ],
       "libraries+": [
-        "-lTKBO<(dbg)",
-        "-lTKBool<(dbg)",
-        "-lTKBRep<(dbg)",
-        "-lTKernel<(dbg)",
-        "-lTKFeat<(dbg)",
-        "-lTKFillet<(dbg)",
-        "-lTKG2d<(dbg)",
-        "-lTKG3d<(dbg)",
-        "-lTKGeomAlgo<(dbg)",
-        "-lTKGeomBase<(dbg)",
-        "-lTKIGES<(dbg)",
-        "-lTKernel<(dbg)",
-        "-lTKMath<(dbg)",
-        "-lTKMesh<(dbg)",
-        "-lTKOffset<(dbg)",
-        "-lTKPrim<(dbg)",
-        "-lTKShHealing<(dbg)",
-        "-lTKTopAlgo<(dbg)",
-        "-lTKSTEP<(dbg)",
-        "-lTKSTEPAttr<(dbg)",
-        "-lTKSTEPBase<(dbg)",
-        "-lTKSTEP209<(dbg)",
-        "-lTKFillet<(dbg)",
-        "-lTKFeat<(dbg)",
-        "-lTKXSBase<(dbg)",
-        "-lTKSTL<(dbg)",
+
+        "-lv8",
+        "-lTKBinL",
+        "-lTKBin",
+        "-lTKBinTObj",
+        "-lTKBinXCAF",
+        "-lTKBool",
+        "-lTKBO",
+        "-lTKBRep",
+        "-lTKCAF",
+        "-lTKCDF",
+        "-lTKDCAF",
+        "-lTKDraw",
+        "-lTKernel",
+        "-lTKFeat",
+        "-lTKFillet",
+        "-lTKG2d",
+        "-lTKG3d",
+        "-lTKGeomAlgo",
+        "-lTKGeomBase",
+        "-lTKHLR",
+        "-lTKIGES",
+        "-lTKLCAF",
+        "-lTKMath",
+        "-lTKMesh",
+        "-lTKMeshVS",
+        "-lTKOffset",
+        "-lTKOpenGl",
+        "-lTKPrim",
+        "-lTKQADraw",
+        "-lTKRWMesh",
+        "-lTKService",
+        "-lTKShHealing",
+        "-lTKStdL",
+        "-lTKStd",
+        "-lTKSTEP209",
+        "-lTKSTEPAttr",
+        "-lTKSTEPBase",
+        "-lTKSTEP",
+        "-lTKSTL",
+        "-lTKTObjDRAW",
+        "-lTKTObj",
+        "-lTKTopAlgo",
+        "-lTKTopTest",
+        "-lTKV3d",
+        "-lTKVCAF",
+        "-lTKViewerTest",
+        "-lTKVRML",
+        "-lTKXCAF",
+        "-lTKXDEDRAW",
+        "-lTKXDEIGES",
+        "-lTKXDESTEP",
+        "-lTKXMesh",
+        "-lTKXmlL",
+        "-lTKXml",
+        "-lTKXmlTObj",
+        "-lTKXmlXCAF",
+        "-lTKXSBase",
+        "-lTKXSDRAW"
       ],
       "other_libraries": [
-        "-lTKTObj<(dbg)",
-        "-lTKLCAF<(dbg)"
+        "-lTKTObj",
+        "-lTKLCAF"
       ],
     },
     {
       "target_name": "action_after_build",
       "type": "none",
-      "dependencies": [
-        "<(module_name)"
-      ],
-      "copies": [
-        {
-          "files": [
-            "<(PRODUCT_DIR)/<(module_name).node",
-          ],
-          "destination": "<(module_path)"
-        }
-      ]
     },
     {
       "target_name": "action_after_build1",
       "type": "none",
-      "dependencies": [
-        "<(module_name)"
-      ],
       "conditions": [
 
         ["OS=='win'",

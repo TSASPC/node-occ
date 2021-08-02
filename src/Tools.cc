@@ -712,9 +712,9 @@ NAN_METHOD(writeGLTF)
     TColStd_IndexedDataMapOfStringString aMetadata;
 
     //occHandle(Message_ProgressIndicator) progress = new MyProgressIndicator(this);
-    occHandle(XCAFApp_Application) hApp = XCAFApp_Application::GetApplication();
     occHandle(TDocStd_Document) hDoc;
-    hApp->NewDocument(TCollection_ExtendedString("MDTV-CAF"), hDoc);
+    //occHandle(XCAFApp_Application) hApp; 
+    XCAFApp_Application::GetApplication()->NewDocument(TCollection_ExtendedString("MDTV-XCAF"), hDoc);
     occHandle(XCAFDoc_ShapeTool) myAssembly = XCAFDoc_DocumentTool::ShapeTool (hDoc->Main()); 
     //TDF_Label aLabel = myAssembly->NewShape() 
     RWGltf_CafWriter aWriter (filename.c_str(), filename.substr(filename.find_last_of(".") + 1)=="glb");
@@ -726,12 +726,35 @@ NAN_METHOD(writeGLTF)
     for (std::list<Shape*>::iterator it = shapes.begin(); it != shapes.end(); it++) {
       TDF_Label aLabel = myAssembly->AddShape((*it)->shape(), makeAssembly); 
     }
+    TDF_LabelSequence aRootLabels;
+    myAssembly->GetFreeShapes(aRootLabels);
+    TopoDS_Compound aCompound;
+    BRep_Builder    aBuildTool;
+    aBuildTool.MakeCompound (aCompound);
+    for (TDF_LabelSequence::Iterator aRootIter (aRootLabels); aRootIter.More(); aRootIter.Next())
+    {
+      const TDF_Label& aRootLabel = aRootIter.Value();
+      TopoDS_Shape aRootShape;
+      if (XCAFDoc_ShapeTool::GetShape (aRootLabel, aRootShape))
+      {
+        aBuildTool.Add (aCompound, aRootShape);
+      }
+    }
+
+    // perform meshing
+    occHandle(Prs3d_Drawer) aDrawer = new Prs3d_Drawer(); // holds visualization defaults
+    BRepMesh_IncrementalMesh anAlgo;
+    //anAlgo.ChangeParameters().Deflection = Prs3d::GetDeflection (aCompound, aDrawer);
+    anAlgo.ChangeParameters().Angle      = 20.0 * M_PI / 180.0; // 20 degrees
+    anAlgo.ChangeParameters().InParallel = true;
+    anAlgo.SetShape (aCompound);
+    anAlgo.Perform();
     bool status = aWriter.Perform (hDoc, aMetadata, Message_ProgressRange());
     if (!status) {
 
-        hApp->Close(hDoc);
+       // hApp->Close(hDoc);
         return Nan::ThrowError("Failed to write GLTF");
-      }
+      } 
   } CATCH_AND_RETHROW("Failed to write GLTF");
 
   info.GetReturnValue().Set(Nan::New<v8::Boolean>(true));
