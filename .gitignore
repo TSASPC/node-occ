@@ -55,5 +55,6 @@ lib/binding
 *.tgz
 npm-debug*
 occt-*
+.vscode
 
 bower_components

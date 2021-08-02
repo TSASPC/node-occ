@@ -1,6 +1,6 @@
 {
-  "name": "node-occ",
-  "version": "1.0.2",
+  "name": "@tsaspc/node-occ",
+  "version": "1.0.4",
   "description": "OpenCascade OCCT Wrapper for Node js",
   "preferGlobal": true,
   "dependencies": {
@@ -28,9 +28,7 @@
     "should": "~13.2.3"
   },
   "main": "index",
-  "author": {
-    "name": "TSASPC LLC"
-  },
+  "author": "TSASPC LLC",
   "engines": {
     "node": "*"
   },
@@ -45,7 +43,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/tsaspc/node-occ.git"
+    "url": "git+https://github.com/tsaspc/node-occ.git"
   },
   "scripts": {
     "install": "node-gyp rebuild",
@@ -58,15 +56,20 @@
     "module_name": "occ",
     "module_path": "./lib/binding/",
     "host-aws": "https://nodeocc.s3-us-west-1.amazonaws.com",
-    "host": "https://github.com/openwebcad/node-occ/releases/download/",
+    "host": "https://github.com/tsaspc/node-occ/releases/download/",
     "remote_path": "{version}"
   },
   "gypfile": true,
   "bugs": {
-    "url": "https://github.com/openwebcad/node-occ/issues"
+    "url": "https://github.com/tsaspc/node-occ/issues"
   },
   "directories": {
+    "lib": "lib",
     "test": "test"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "homepage": "https://github.com/tsaspc/node-occ#readme",
+  "bin": {
+    "node-occ": "STEPtoBREP.js"
+  }
 }

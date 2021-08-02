@@ -2,24 +2,22 @@
 
 OpenCascade nodejs extension for solid modeling.
 
----- NOTICE ------
+# ---- NOTICE ------
 Module is being refactored for 7.5.0 Updates from OpenCASCADE Library
 
-Current Work:
+# Current Work:
 
-Rework Progress Indicators
+-   Rework Progress Indicators
 
-Add GLTF Export
+-   Add IGES Import/Export
 
-Add IGES Import/Export
+-   Add Surface fitting support
 
-Add Surface fitting support
+-   Add NURBs support
 
-Add NURBs support
+# Long Term goal:
 
-Long Term goal:
-
-Revamp to force XDE
+-   Revamp to force XDE
 
 
 
@@ -60,7 +58,8 @@ alt="node occ" width="240" height="180" border="10" /></a>
 -   boolean operation ( fuse , common , cut )
 -   features ( draftAngle)
 -   solid properties ( faces, edges, vertices, area , volume )
--   import export ( STEP BREP )
+-   export ( STL GLTF STEP BREP )
+-   import ( STEP BREP )
 -   
 
 ### sample web application
@@ -88,6 +87,7 @@ sudo apt-get install cmake cmake-curses-gui g++ build-essential libtbb2
 sudo apt-get install tcllib tklib tcl-dev tk-dev libfreetype6-dev libx11-dev libgl1-mesa-dev libfreeimage-dev rapidjson-dev
 cmake -DCMAKE_SUPPRESS_REGENERATION:BOOL=ON -DOCE_MULTITHREADED_BUILD:BOOL=ON -DBUILD_SHARED_LIBS:BOOL=OFF -DBUILD_TESTING:BOOLEAN=OFF -DOCE_DRAW:BOOLEAN=OFF -DOCE_TESTING:BOOLEAN=OFF -DOCE_OCAF:BOOLEAN=OFF -DOCE_VISUALISATION:BOOLEAN=OFF -DOCE_DISABLE_X11:BOOLEAN=ON -DUSE_RAPIDJSON:BOOLEAN=ON -DOCE_DISABLE_TKSERVICE_FONT:BOOLEAN=ON -DOCE_USE_PCH:BOOLEAN=ON .
 sudo apt-get install libv8-dev
+sudo apt-get install libxmu-dev libxi-dev
 # ------------------------------------
 git clone --recursive https://github.com/tsaspc/node-occ.git
 cd node-occ
