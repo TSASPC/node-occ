@@ -1,5 +1,5 @@
 const nodeocc = require("..");
 const occ = nodeocc.occ;
-occ.readSTEP("battleship.STEP", function (err, shapes) {
-    occ.writeGLTF("battleship.gltf",shapes)
+occ.readSTEP("VAT_Test.step", function (err, shapes) {
+    occ.writeGLTF("VAT_Test.gltf",shapes)
 });

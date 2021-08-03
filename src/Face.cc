@@ -205,6 +205,56 @@ v8::Local<v8::Object> Face::createMesh(double factor, double angle, bool quality
   return scope.Escape(theMesh);
 }
 
+v8::Local<v8::String> Face::getType()
+{
+  Nan::EscapableHandleScope scope;
+  v8::Local<v8::String> Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "NaN");
+
+  const TopoDS_Face& face = this->face();
+
+  try {
+    BRepAdaptor_Surface surface(face);
+    switch(surface.GetType())
+    {
+      case (GeomAbs_Plane):
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "Plane");
+      break;
+      case (GeomAbs_Cylinder):
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "Cylinder");
+      break;
+      case (GeomAbs_Cone):
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "Cone");
+      break;
+      case (GeomAbs_Sphere):
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "Sphere");
+      break;
+      case (GeomAbs_Torus):
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "Torus");
+      break;
+      case (GeomAbs_BezierSurface):
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "BezierSurface");
+      break;
+      case (GeomAbs_BSplineSurface):
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "BSplineSurface");
+      break;
+      case (GeomAbs_SurfaceOfRevolution):
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "SurfaceOfRevolution");
+      break;
+      case (GeomAbs_SurfaceOfExtrusion):
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "SurfaceOfExtrusion");
+      break;
+      case (GeomAbs_OffsetSurface):
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "OffsetSurface");
+      break;
+      case (GeomAbs_OtherSurface):
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "OtherSurface");
+      break;
+    }
+
+  } CATCH_AND_RETHROW_NO_RETURN("Failed to find Surface Type ");
+  return scope.Escape(Type);
+}
+
 
 void Face::InitNew(_NAN_METHOD_ARGS)
 {
@@ -234,6 +284,7 @@ void Face::Init(v8::Local<v8::Object> target)
 
   EXPOSE_METHOD(Face,getWires);
   EXPOSE_METHOD(Face,createMesh);
+  EXPOSE_METHOD(Face,getType);
   EXPOSE_READ_ONLY_PROPERTY_INTEGER(Face,numWires);
   EXPOSE_READ_ONLY_PROPERTY_DOUBLE(Face,area);
   EXPOSE_READ_ONLY_PROPERTY_BOOLEAN(Face,isPlanar);
@@ -248,4 +299,10 @@ NAN_METHOD(Face::createMesh)
   Face* pThis = UNWRAP(Face);
   v8::Local<v8::Object> mesh = pThis->createMesh(1,0.5,true);
   info.GetReturnValue().Set(mesh);
+}
+NAN_METHOD(Face::getType)
+{
+  Face* pThis = UNWRAP(Face);
+  v8::Local<v8::String> Type = pThis->getType();
+  info.GetReturnValue().Set(Type);
 }

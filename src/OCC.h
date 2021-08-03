@@ -16,6 +16,7 @@
 #include <BRepLib.hxx>
 
 #include <BRepAdaptor_Curve.hxx>
+#include <BRepAdaptor_Surface.hxx>
 #include <BRepBndLib.hxx>
 #include <BRepGProp.hxx>
 #include <BRepPrimAPI_MakeBox.hxx>
@@ -173,6 +174,7 @@
 #include <Interface_Static.hxx>
 #include <Prs3d.hxx>
 #include <Prs3d_Drawer.hxx>
+#include <STEPCAFControl_Reader.hxx>
 
 // Compatibility 6.5 and above
 #if (OCC_VERSION_MAJOR * 10 + OCC_VERSION_MINOR )  < 66

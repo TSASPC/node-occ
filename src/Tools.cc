@@ -374,6 +374,61 @@ void StepAsyncReadWorker::Execute() {
   //progress->Show();
 
   try {
+   /* occHandle(TDocStd_Document) hDoc;
+    occHandle(XCAFApp_Application) hApp = XCAFApp_Application::GetApplication();
+    hApp->NewDocument(TCollection_ExtendedString("MDTV-XCAF"), hDoc);
+    occHandle(XCAFDoc_ShapeTool) Assembly = XCAFDoc_DocumentTool::ShapeTool (hDoc->Main()); 
+    
+      STEPCAFControl_Reader aReader;
+    Interface_Static::SetCVal("xstep.cascade.unit",    "mm");
+    Interface_Static::SetIVal("read.step.nonmanifold",  1);
+    Interface_Static::SetIVal("read.step.product.mode", 1);
+      aReader.SetColorMode(true);
+      aReader.SetNameMode(true);
+      aReader.SetLayerMode(true);
+      if (aReader.ReadFile((Standard_CString)(_filename.c_str())) != IFSelect_RetDone) {
+
+      std::stringstream str;
+    std::cerr << " (1) cannot read STEP file "  << std::endl;
+    this->SetErrorMessage("2 - caught C++ exception in readStep");
+    this->_retValue = 2;
+
+      // Local<Value> argv[] = { Local<Value>(String::New())  };
+      //  Local<Value>  res =  callback->Call(global, 1, argv);
+      // NanReturnUndefined();
+      //progress->EndScope();
+      //progress->SetValue(105.0);
+      //progress->Show();
+      this->_retValue = 1;
+      return;
+
+    }
+    aReader.Transfer(hDoc);
+
+    TDF_LabelSequence frshapes;
+    Assembly->GetShapes(frshapes);
+    if (frshapes.Length() == 0) {
+      std::stringstream str;
+    std::cerr << " (1) cannot read STEP file "  << std::endl;
+    this->SetErrorMessage("2 - caught C++ exception in readStep (No Data)");
+    this->_retValue = 2;
+    return;
+    } else if (frshapes.Length() == 1) {
+        TopoDS_Shape shape = Assembly->GetShape(frshapes.Value(1));
+                    this->shapes.push_back(shape);
+    } else {
+        for (Standard_Integer i=1; i<frshapes.Length(); i++) {
+            TopoDS_Shape S = Assembly->GetShape(frshapes.Value(i));
+
+            TDF_Label aLabel = Assembly->FindShape(S, Standard_False);
+            if ( (!aLabel.IsNull()) && (Assembly->IsShape(aLabel)) ) {
+                if (Assembly->IsFree(aLabel) ) {
+                    this->shapes.push_back(S);
+                }
+            }
+        }
+    }
+    */
 
     STEPControl_Reader aReader;
 
@@ -425,7 +480,9 @@ void StepAsyncReadWorker::Execute() {
       if (!ok || nbs == 0) {
         continue; // skip empty root
       }
-      if ((n + 1) % mod == 0) { /*progress->Increment();*/ }
+      if ((n + 1) % mod == 0) { 
+        //progress->Increment(); 
+      }
     }
 
     //aReader.WS()->MapReader()->SetProgress(0);
@@ -519,15 +576,6 @@ void StepAsyncReadWorker::Execute() {
         // skip 'N0NE' name
         if (aName->UsefullLength() == 4 && toupper(aName->Value(1)) == 'N' &&toupper(aName->Value(2)) == 'O' && toupper(aName->Value(3)) == 'N' && toupper(aName->Value(4)) == 'E')
           continue;
-        /*
-        // special check to pass names like "Open CASCADE STEP translator 6.3 1"
-        TCollection_AsciiString aSkipName ("Open CASCADE STEP translator");
-        if (aName->Length() >= aSkipName.Length()) {
-        if (aName->String().SubString(1, aSkipName.Length()).IsEqual(aSkipName))
-        continue;
-        }
-
-        */
         TCollection_ExtendedString aNameExt(aName->ToCString());
 
         // find target shape
@@ -544,25 +592,21 @@ void StepAsyncReadWorker::Execute() {
           if (aSub.IsPartner(S)) {
 
             //xx cout << " name of part =" << aName->ToCString() << "  shape " << HashCode(aSub, -1) << " " << aSub.ShapeType() << endl;
-#if 0
-            // create label and set shape
-            if (L.IsNull()) {
-              TDF_TagSource aTag;
-              L = aTag.NewChild(theShapeLabel);
-              TNaming_Builder tnBuild(L);
-              //tnBuild.Generated(S);
-              tnBuild.Generated(aSub);
-            }
-            // set a name
-            TDataStd_Name::Set(L, aNameExt);
-#endif
           }
         }
 
       }
       // END: Store names
     }
+    
   }
+  /*catch (OSD_Exception& e) {
+      Base::Console().Error("%s\n", e.GetMessageString());
+      Base::Console().Message("Try to load STEP file without colors...\n");
+
+      Part::ImportStepParts(pcDoc,Utf8Name.c_str());
+      pcDoc->recompute();
+  }*/
   catch (...) {
     std::cerr << " EXCEPTION in READ STEP" << std::endl;
     this->SetErrorMessage("2 - caught C++ exception in readStep");
@@ -713,8 +757,8 @@ NAN_METHOD(writeGLTF)
 
     //occHandle(Message_ProgressIndicator) progress = new MyProgressIndicator(this);
     occHandle(TDocStd_Document) hDoc;
-    //occHandle(XCAFApp_Application) hApp; 
-    XCAFApp_Application::GetApplication()->NewDocument(TCollection_ExtendedString("MDTV-XCAF"), hDoc);
+    occHandle(XCAFApp_Application) hApp = XCAFApp_Application::GetApplication();
+    hApp->NewDocument(TCollection_ExtendedString("MDTV-XCAF"), hDoc);
     occHandle(XCAFDoc_ShapeTool) myAssembly = XCAFDoc_DocumentTool::ShapeTool (hDoc->Main()); 
     //TDF_Label aLabel = myAssembly->NewShape() 
     RWGltf_CafWriter aWriter (filename.c_str(), filename.substr(filename.find_last_of(".") + 1)=="glb");
@@ -750,9 +794,9 @@ NAN_METHOD(writeGLTF)
     anAlgo.SetShape (aCompound);
     anAlgo.Perform();
     bool status = aWriter.Perform (hDoc, aMetadata, Message_ProgressRange());
-    if (!status) {
 
-       // hApp->Close(hDoc);
+    hApp->Close(hDoc);
+    if (!status) {
         return Nan::ThrowError("Failed to write GLTF");
       } 
   } CATCH_AND_RETHROW("Failed to write GLTF");
