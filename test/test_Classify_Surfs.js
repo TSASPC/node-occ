@@ -8,6 +8,7 @@ occ.readSTEP("VAT_Test.step", function (err, shapes) {
         for (let j = 0; j < faces.length; j++){
             const face = faces[j];
             console.log(face.getType())
+            console.log(face.getTypeJSON())
         }
     }
 });

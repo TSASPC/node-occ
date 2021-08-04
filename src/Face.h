@@ -46,6 +46,7 @@ public:
 
   v8::Local<v8::Object> createMesh(double factor, double angle, bool qualityNormals);
   v8::Local<v8::String> getType();
+  v8::Local<v8::String> getTypeJSON();
 
   static void Init(v8::Local<v8::Object> target);
   static v8::Local<v8::Object> NewInstance(const TopoDS_Face& face);
@@ -53,6 +54,7 @@ public:
   static NAN_METHOD(New);
   static NAN_METHOD(createMesh); // custom mesh
   static NAN_METHOD(getType); // get Surface Type
+  static NAN_METHOD(getTypeJSON);
   static NAN_PROPERTY_GETTER(_mesh);
   static NAN_METHOD(getWires);
 

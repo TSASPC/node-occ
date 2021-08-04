@@ -3,6 +3,8 @@
 #include "Edge.h"
 #include "Util.h"
 #include "Mesh.h"
+#include <string>
+#include <sstream>
 
 Face::~Face() {
 	m_cacheMesh.Reset();
@@ -255,6 +257,143 @@ v8::Local<v8::String> Face::getType()
   return scope.Escape(Type);
 }
 
+v8::Local<v8::String> Face::getTypeJSON()
+{
+  Nan::EscapableHandleScope scope;
+  v8::Local<v8::String> Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "NaN");
+
+  const TopoDS_Face& face = this->face();
+
+  try {
+    BRepAdaptor_Surface surface(face);
+    std::stringstream s;
+    switch(surface.GetType())
+    {
+      case (GeomAbs_Plane):
+      {
+        Standard_Real A,B,C,D;
+        //A * X + B * Y + C * Z + D = 0.
+        surface.Plane().Coefficients(A,B,C,D);
+        s << "{\"A\":" << A;
+        s << ",\"B\":" << B;
+        s << ",\"C\":" << C;
+        s << ",\"D\":" << D << "}";
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
+      
+      break;
+      }
+      case (GeomAbs_Cylinder):
+      {
+        Standard_Real A1,A2,A3,B1,B2,B3,C1,C2,C3,D;
+        surface.Cylinder().Coefficients(A1,A2,A3,B1,B2,B3,C1,C2,C3,D);
+        s << "{\"A1\":" << A1;
+        s << ",\"A2\":" << A2;
+        s << ",\"A3\":" << A3;
+        s << ",\"B1\":" << B1;
+        s << ",\"B2\":" << B2;
+        s << ",\"B3\":" << B3;
+        s << ",\"C1\":" << C1;
+        s << ",\"C2\":" << C2;
+        s << ",\"C3\":" << C3;
+        s << ",\"D\":" << D << "}";
+        // A1.X**2 + A2.Y**2 + A3.Z**2 + 2.(B1.X.Y + B2.X.Z + B3.Y.Z) +
+        // 2.(C1.X + C2.Y + C3.Z) + D = 0.0
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
+      
+      break;
+      }
+      case (GeomAbs_Cone):
+      {
+        Standard_Real A1,A2,A3,B1,B2,B3,C1,C2,C3,D;
+        surface.Cone().Coefficients(A1,A2,A3,B1,B2,B3,C1,C2,C3,D);
+        s << "{\"A1\":" << A1;
+        s << ",\"A2\":" << A2;
+        s << ",\"A3\":" << A3;
+        s << ",\"B1\":" << B1;
+        s << ",\"B2\":" << B2;
+        s << ",\"B3\":" << B3;
+        s << ",\"C1\":" << C1;
+        s << ",\"C2\":" << C2;
+        s << ",\"C3\":" << C3;
+        s << ",\"D\":" << D << "}";
+      //A1.X**2 + A2.Y**2 + A3.Z**2 + 2.(B1.X.Y + B2.X.Z + B3.Y.Z) + 2.(C1.X + C2.Y + C3.Z) + D = 0.0.
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
+      break;
+      }
+      case (GeomAbs_Sphere):
+      {
+        Standard_Real A1,A2,A3,B1,B2,B3,C1,C2,C3,D;
+        surface.Sphere().Coefficients(A1,A2,A3,B1,B2,B3,C1,C2,C3,D);
+        s << "{\"A1\":" << A1;
+        s << ",\"A2\":" << A2;
+        s << ",\"A3\":" << A3;
+        s << ",\"B1\":" << B1;
+        s << ",\"B2\":" << B2;
+        s << ",\"B3\":" << B3;
+        s << ",\"C1\":" << C1;
+        s << ",\"C2\":" << C2;
+        s << ",\"C3\":" << C3;
+        s << ",\"D\":" << D << "}";
+        //A1.X**2 + A2.Y**2 + A3.Z**2 + 2.(B1.X.Y + B2.X.Z + B3.Y.Z) +
+        //2.(C1.X + C2.Y + C3.Z) + D = 0.0
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
+      break;
+      }
+      case (GeomAbs_Torus):
+      {
+        TColStd_Array1OfReal    Coeffs  (1,35);
+        surface.Torus().Coefficients(Coeffs);
+       s << "{";
+       for (int i = 1; i < 36; i++){
+         s << "\"C"<< i <<"\":" << Coeffs.Value(i);
+       }
+       s << "}";
+        /*
+        Coef(1) * X^4 + Coef(2) * Y^4 + Coef(3) * Z^4 +
+        Coef(4) * X^3 * Y + Coef(5) * X^3 * Z + Coef(6) * Y^3 * X +
+        Coef(7) * Y^3 * Z + Coef(8) * Z^3 * X + Coef(9) * Z^3 * Y +
+        Coef(10) * X^2 * Y^2 + Coef(11) * X^2 * Z^2 +
+        Coef(12) * Y^2 * Z^2 + Coef(13) * X^2 * Y * Z +
+        Coef(14) * X * Y^2 * Z + Coef(15) * X * Y * Z^2 +
+        Coef(16) * X^3 + Coef(17) * Y^3 + Coef(18) * Z^3 + 
+        Coef(19) * X^2 * Y + Coef(20) * X^2 * Z + Coef(21) * Y^2 * X +
+        Coef(22) * Y^2 * Z + Coef(23) * Z^2 * X + Coef(24) * Z^2 * Y +
+        Coef(25) * X * Y * Z +
+        Coef(26) * X^2 + Coef(27) * Y^2 + Coef(28) * Z^2 +
+        Coef(29) * X * Y + Coef(30) * X * Z + Coef(31) * Y * Z +
+        Coef(32) * X + Coef(33) * Y + Coef(34) *  Z + 
+        Coef(35) = 0.0
+        */
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
+      break;
+      }
+      case (GeomAbs_BezierSurface):
+        surface.Bezier()->DumpJson(s, -1);
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "Bezier Not Implemented");
+      break;
+      case (GeomAbs_BSplineSurface):
+        surface.BSpline()->DumpJson(s, -1);
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  s.str().c_str());
+      break;
+      //These will need work in their JSON Rep.
+      case (GeomAbs_SurfaceOfRevolution):
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "SurfaceOfRevolution Not Implemented");
+      break;
+      case (GeomAbs_SurfaceOfExtrusion):
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "SurfaceOfExtrusion Not Implemented");
+      break;
+      case (GeomAbs_OffsetSurface):
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "OffsetSurface Not Implemented");
+      break;
+      case (GeomAbs_OtherSurface):
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "OtherSurface Not Implemented");
+      break;
+    }
+
+  } CATCH_AND_RETHROW_NO_RETURN("Failed to find Surface Type ");
+  return scope.Escape(Type);
+}
+
 
 void Face::InitNew(_NAN_METHOD_ARGS)
 {
@@ -285,6 +424,7 @@ void Face::Init(v8::Local<v8::Object> target)
   EXPOSE_METHOD(Face,getWires);
   EXPOSE_METHOD(Face,createMesh);
   EXPOSE_METHOD(Face,getType);
+  EXPOSE_METHOD(Face,getTypeJSON);
   EXPOSE_READ_ONLY_PROPERTY_INTEGER(Face,numWires);
   EXPOSE_READ_ONLY_PROPERTY_DOUBLE(Face,area);
   EXPOSE_READ_ONLY_PROPERTY_BOOLEAN(Face,isPlanar);
@@ -304,5 +444,11 @@ NAN_METHOD(Face::getType)
 {
   Face* pThis = UNWRAP(Face);
   v8::Local<v8::String> Type = pThis->getType();
+  info.GetReturnValue().Set(Type);
+}
+NAN_METHOD(Face::getTypeJSON)
+{
+  Face* pThis = UNWRAP(Face);
+  v8::Local<v8::String> Type = pThis->getTypeJSON();
   info.GetReturnValue().Set(Type);
 }

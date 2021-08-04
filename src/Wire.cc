@@ -61,6 +61,8 @@ const char* toString(BRepBuilderAPI_WireError err)
 }
 
 
+
+
 NAN_METHOD(Wire::NewInstance) { _NewInstance<Wire>(info); }
 
 
@@ -170,6 +172,4 @@ NAN_METHOD(Wire::getVertices)
   auto arr = extract_shapes_as_javascript_array(pThis,TopAbs_VERTEX);
   info.GetReturnValue().Set(arr);
 }
-
-
 

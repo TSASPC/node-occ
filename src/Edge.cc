@@ -114,6 +114,49 @@ int Edge::createArc3P(Vertex *start, Vertex *end, const gp_Pnt& aPoint)
   return 1;
 }
 
+v8::Local<v8::String> Edge::getType()
+{
+  Nan::EscapableHandleScope scope;
+  v8::Local<v8::String> Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "NaN");
+
+  const TopoDS_Edge& edge = this->edge();
+
+  try {
+    BRepAdaptor_Curve w(edge);
+    switch(w.GetType())
+    {
+      case (GeomAbs_Line):
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "Line");
+      break;
+      case (GeomAbs_Circle):
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "Circle");
+      break;
+      case (GeomAbs_Ellipse):
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "Ellipse");
+      break;
+      case (GeomAbs_Hyperbola):
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "Hyperbola");
+      break;
+      case (GeomAbs_Parabola):
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "Parabola");
+      break;
+      case (GeomAbs_BezierCurve):
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "BezierCurve");
+      break;
+      case (GeomAbs_BSplineCurve):
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "BSplineCurve");
+      break;
+      case (GeomAbs_OffsetCurve):
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "OffsetCurve");
+      break;
+      case (GeomAbs_OtherCurve):
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "OtherCurve");
+      break;
+    }
+
+  } CATCH_AND_RETHROW_NO_RETURN("Failed to find Edge Type ");
+  return scope.Escape(Type);
+}
 int Edge::createCircle(const gp_Pnt& center, const gp_Dir& normal, double radius)
 {
   try {
@@ -470,3 +513,10 @@ NAN_METHOD(Edge::polygonize)
   info.GetReturnValue().Set(ret);
 }
 
+
+NAN_METHOD(Edge::getType)
+{
+  Edge* pThis = UNWRAP(Edge);
+  v8::Local<v8::String> Type = pThis->getType();
+  info.GetReturnValue().Set(Type);
+}

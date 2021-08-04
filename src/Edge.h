@@ -27,6 +27,7 @@ public:
     int createArc3P(Vertex *start, Vertex *end, const gp_Pnt& middlePoint);
 
     int createCircle(const gp_Pnt& center , const gp_Dir& normal, double radius);
+    v8::Local<v8::String> getType();
 
     //int createEllipse(OCCStruct3d pnt, OCCStruct3d nor, double rMajor, double rMinor);
     //int createHelix(double pitch, double height, double radius, double angle, bool leftHanded);
@@ -66,6 +67,7 @@ public:
     static NAN_METHOD(New);
     static NAN_METHOD(startVertex);
     static NAN_METHOD(endVertex);
+    static NAN_METHOD(getType); // get Edge Type
 
     static void Init(v8::Local<v8::Object> target);
     static Nan::Persistent<v8::FunctionTemplate> _template;

@@ -176,6 +176,17 @@
 #include <Prs3d_Drawer.hxx>
 #include <STEPCAFControl_Reader.hxx>
 
+
+#include <TColStd_Array1OfReal.hxx>
+
+//Surface Geometries
+#include <gp_Cylinder.hxx>
+#include <gp_Cone.hxx>
+#include <gp_Sphere.hxx>
+#include <gp_Torus.hxx>
+#include <Geom_BSplineSurface.hxx>
+#include <Geom_BezierSurface.hxx>
+
 // Compatibility 6.5 and above
 #if (OCC_VERSION_MAJOR * 10 + OCC_VERSION_MINOR )  < 66
 
