@@ -1,6 +1,6 @@
 const nodeocc = require("..");
 const occ = nodeocc.occ;
-occ.readSTEP("VAT_Test.step", function (err, shapes) {
+occ.readSTEP("Sphere.step", function (err, shapes) {
     //Plane, Cylinder, Cone, Sphere, Torus, BezierSurface, BSplineSurface, SurfaceOfRevolution, SurfaceOfExtrusion, OtherSurface.
     for (let i = 0; i < shapes.length; i++){
         const solid = shapes[i];

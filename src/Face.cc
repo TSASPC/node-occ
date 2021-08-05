@@ -260,7 +260,7 @@ v8::Local<v8::String> Face::getType()
 v8::Local<v8::String> Face::getTypeJSON()
 {
   Nan::EscapableHandleScope scope;
-  v8::Local<v8::String> Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "NaN");
+  v8::Local<v8::String> Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "{err:\"Not Supported\"}");
 
   const TopoDS_Face& face = this->face();
 
@@ -368,25 +368,132 @@ v8::Local<v8::String> Face::getTypeJSON()
       break;
       }
       case (GeomAbs_BezierSurface):
-        surface.Bezier()->DumpJson(s, -1);
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "Bezier Not Implemented");
-      break;
-      case (GeomAbs_BSplineSurface):
-        surface.BSpline()->DumpJson(s, -1);
+      {
+        occHandle(Geom_BezierSurface) bezier = surface.Bezier();
+        const TColgp_Array2OfPnt poles = bezier->Poles();
+        TColStd_Array2OfReal Weights;
+        bezier->Weights(Weights);
+        s << "{";
+        s << "\"Poles\":[";
+         for (Standard_Integer i = poles.LowerRow(); i <= poles.UpperRow(); i++){
+          if (i != 1)
+            s << ",";
+          s << "[";
+          for (Standard_Integer j = poles.LowerCol(); j <= poles.UpperCol(); j++){
+            gp_Pnt pole = poles.Value(i,j);
+            if (j!=1)
+              s << ",";
+            s << "{\"x\":" << pole.X() << ",\"y\":" << pole.Y() << ",\"z\":" << pole.Z() <<"}";
+          }
+          s << "]";
+         }
+         s << "],";
+         s << "\"Weights\":[";
+         for (Standard_Integer i = Weights.LowerRow(); i <= Weights.UpperRow(); i++){
+          for (Standard_Integer j = Weights.LowerCol(); j <= Weights.UpperCol(); j++){
+            if (j!=1)
+              s << ",";
+            s << Weights.Value(i,j);
+          }
+         }
+         s << "]";
+        s << "}";
         Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  s.str().c_str());
       break;
+      }
+      case (GeomAbs_BSplineSurface):
+      {
+         occHandle(Geom_BSplineSurface) bspline = surface.BSpline();
+         //The Spline Data:
+         s << "{";
+         s << "\"Poles\":[";
+         const TColgp_Array2OfPnt poles = bspline->Poles();
+         for (Standard_Integer i = poles.LowerRow(); i <= poles.UpperRow(); i++){
+          if (i != 1)
+            s << ",";
+          s << "[";
+          for (Standard_Integer j = poles.LowerCol(); j <= poles.UpperCol(); j++){
+            gp_Pnt pole = poles.Value(i,j);
+            if (j!=1)
+              s << ",";
+            s << "{\"x\":" << pole.X() << ",\"y\":" << pole.Y() << ",\"z\":" << pole.Z() <<"}";
+          }
+          s << "]";
+         
+         }
+         s << "],";
+         TColStd_Array2OfReal Weights;
+         bspline->Weights(Weights);
+         s << "\"Weights\":[";
+         
+         for (Standard_Integer i = Weights.LowerRow(); i <= Weights.UpperRow(); i++){
+           if (i != 1)
+            s << ",";
+          s << "[";
+          for (Standard_Integer j = Weights.LowerCol(); j <= Weights.UpperCol(); j++){
+            if (!(i==1 && j==1))
+              s << ",";
+            s <<Weights.Value(i,j);
+          }
+          s << "]";
+         }
+         s << "],";
+         const TColStd_Array1OfReal UKnots = bspline->UKnots();
+         s << "\"UKnots\":[";
+         for (Standard_Integer i = UKnots.Lower(); i <= UKnots.Upper(); i++){
+           if (i != 1)
+            s << ",";
+          s << UKnots.Value(i);
+         }
+         s << "],";
+         const TColStd_Array1OfReal VKnots = bspline->VKnots();
+         s << "\"VKnots\":[";
+         for (Standard_Integer i = VKnots.Lower(); i <= VKnots.Upper(); i++){
+           if (i != 1)
+            s << ",";
+          s << VKnots.Value(i);
+         }
+         s << "],";
+         const TColStd_Array1OfInteger UMults = bspline->UMultiplicities();
+         s << "\"UMults\":[";
+         for (Standard_Integer i = UMults.Lower(); i <= UMults.Upper(); i++){
+           if (i != 1)
+            s << ",";
+          s << UMults.Value(i);
+         }
+         s << "],";
+         const TColStd_Array1OfInteger VMults = bspline->VMultiplicities();
+         s << "\"VMults\":[";
+         for (Standard_Integer i = VMults.Lower(); i <= VMults.Upper(); i++){
+           if (i != 1)
+            s << ",";
+          s << VMults.Value(i);
+         }
+         s << "],";
+         const Standard_Integer UDegree = bspline->UDegree();
+         s << "\"UDegree\":"<< UDegree<<",";
+         const Standard_Integer VDegree = bspline->VDegree();
+         s << "\"VDegree\":"<< VDegree<<",";
+         const Standard_Boolean UPeriodic = bspline->IsUPeriodic();
+         s << "\"UPeriodic\":"<< UPeriodic<<",";
+         const Standard_Boolean VPeriodic = bspline->IsVPeriodic();
+         s << "\"VPeriodic\":"<< VPeriodic;
+         s << "}";
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  s.str().c_str());
+      break;
+      }
       //These will need work in their JSON Rep.
       case (GeomAbs_SurfaceOfRevolution):
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "SurfaceOfRevolution Not Implemented");
+        //Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "SurfaceOfRevolution Not Implemented");
       break;
       case (GeomAbs_SurfaceOfExtrusion):
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "SurfaceOfExtrusion Not Implemented");
+       // Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "SurfaceOfExtrusion Not Implemented");
       break;
       case (GeomAbs_OffsetSurface):
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "OffsetSurface Not Implemented");
+      //  Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "OffsetSurface Not Implemented");
       break;
       case (GeomAbs_OtherSurface):
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "OtherSurface Not Implemented");
+       // Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "OtherSurface Not Implemented");
       break;
     }
 
@@ -449,6 +556,7 @@ NAN_METHOD(Face::getType)
 NAN_METHOD(Face::getTypeJSON)
 {
   Face* pThis = UNWRAP(Face);
-  v8::Local<v8::String> Type = pThis->getTypeJSON();
+  v8::Local<v8::Object>  Type = v8::Local<v8::Object>::Cast(v8::JSON::Parse(v8::Isolate::GetCurrent()->GetCurrentContext(),  pThis->getTypeJSON()).ToLocalChecked());
+  //v8::Local<v8::String>  Type = pThis->getTypeJSON();
   info.GetReturnValue().Set(Type);
 }
