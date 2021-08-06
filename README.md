@@ -3,7 +3,7 @@
 OpenCascade nodejs extension for solid modeling.
 
 # ---- NOTICE ------
-Module is being refactored for 7.5.0 Updates from OpenCASCADE Library
+Module has been slightly refactored for 7.5.0 Updates from OpenCASCADE Library
 
 # Current Work:
 
@@ -18,6 +18,8 @@ Module is being refactored for 7.5.0 Updates from OpenCASCADE Library
 # Long Term goal:
 
 -   Revamp to force XDE
+
+-   Keep Track of Colors
 
 
 

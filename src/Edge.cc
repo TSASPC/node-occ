@@ -336,6 +336,7 @@ v8::Local<v8::String> Edge::getTypeJSON()
          s << "\"Periodic\":"<< Periodic<<",";
         Standard_Boolean CheckRational=bspline->IsRational();
          s << "\"Rational\":"<< CheckRational;
+         s << "}";
         Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  s.str().c_str());
       break;
       }
@@ -600,6 +601,7 @@ void Edge::Init(v8::Local<v8::Object> target)
 
   EXPOSE_METHOD(Edge, getVertices);
   EXPOSE_METHOD(Face,getTypeJSON);
+  EXPOSE_METHOD(Face,getType);
 
   EXPOSE_READ_ONLY_PROPERTY_DOUBLE(Edge, length);
   EXPOSE_READ_ONLY_PROPERTY_INTEGER(Edge, numVertices);
