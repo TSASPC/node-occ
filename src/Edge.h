@@ -28,6 +28,7 @@ public:
 
     int createCircle(const gp_Pnt& center , const gp_Dir& normal, double radius);
     v8::Local<v8::String> getType();
+    v8::Local<v8::String> getTypeJSON();
 
     //int createEllipse(OCCStruct3d pnt, OCCStruct3d nor, double rMajor, double rMinor);
     //int createHelix(double pitch, double height, double radius, double angle, bool leftHanded);
@@ -68,6 +69,7 @@ public:
     static NAN_METHOD(startVertex);
     static NAN_METHOD(endVertex);
     static NAN_METHOD(getType); // get Edge Type
+    static NAN_METHOD(getTypeJSON);
 
     static void Init(v8::Local<v8::Object> target);
     static Nan::Persistent<v8::FunctionTemplate> _template;

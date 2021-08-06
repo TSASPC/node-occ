@@ -157,6 +157,215 @@ v8::Local<v8::String> Edge::getType()
   } CATCH_AND_RETHROW_NO_RETURN("Failed to find Edge Type ");
   return scope.Escape(Type);
 }
+
+v8::Local<v8::String> Edge::getTypeJSON()
+{
+  Nan::EscapableHandleScope scope;
+  v8::Local<v8::String> Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "NaN");
+
+  const TopoDS_Edge& edge = this->edge();
+
+  try {
+    BRepAdaptor_Curve w(edge);
+    std::stringstream s;
+    switch(w.GetType())
+    {
+      case (GeomAbs_Line):
+      {
+        gp_Lin line = w.Line();
+        const gp_Dir dir =	line.Direction();
+        const gp_Pnt pt =	line.Location();
+        s << "{\"Type\":\"Line\"";
+        s << ",\"x\":" << pt.X();
+        s << ",\"y\":" << pt.Y();
+        s << ",\"z\":" << pt.Z();
+        s << ",\"kx\":" << dir.X();
+        s << ",\"ky\":" << dir.Y();
+        s << ",\"kz\":" << dir.Z();
+        s << "}";
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
+      break;
+      }
+      case (GeomAbs_Circle):
+      {
+        gp_Circ circ = w.Circle();
+        const gp_Ax2 ax =	circ.Position();
+        const Standard_Real R =	circ.Radius();
+        const gp_Dir dir =	ax.Direction();
+        const gp_Pnt pt =	ax.Location();
+        s << "{\"Type\":\"Circle\"";
+        s << ",\"x\":" << pt.X();
+        s << ",\"y\":" << pt.Y();
+        s << ",\"z\":" << pt.Z();
+        s << ",\"kx\":" << dir.X();
+        s << ",\"ky\":" << dir.Y();
+        s << ",\"kz\":" << dir.Z();
+        s << ",\"R\":" << R;
+        s << "}";
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
+      break;
+      }
+      case (GeomAbs_Ellipse):
+      {
+        gp_Elips el = w.Ellipse();
+        const gp_Ax2 ax =	el.Position();
+        const Standard_Real maR =	el.MajorRadius();
+        const Standard_Real miR =	el.MinorRadius();
+        const gp_Dir dir =	ax.Direction();
+        const gp_Pnt pt =	ax.Location();
+        s << "{\"Type\":\"Ellipse\"";
+        s << ",\"x\":" << pt.X();
+        s << ",\"y\":" << pt.Y();
+        s << ",\"z\":" << pt.Z();
+        s << ",\"kx\":" << dir.X();
+        s << ",\"ky\":" << dir.Y();
+        s << ",\"kz\":" << dir.Z();
+        s << ",\"R_major\":" << maR;
+        s << ",\"R_minor\":" << miR;
+        s << "}";
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
+      break;
+      }
+      case (GeomAbs_Hyperbola):
+      {
+        gp_Hypr hy = w.Hyperbola();
+        const gp_Ax2 ax =	hy.Position();
+        const Standard_Real maR =	hy.MajorRadius();
+        const Standard_Real miR =	hy.MinorRadius();
+        const gp_Dir dir =	ax.Direction();
+        const gp_Pnt pt =	ax.Location();
+        s << "{\"Type\":\"Hyperbola\"";
+        s << ",\"x\":" << pt.X();
+        s << ",\"y\":" << pt.Y();
+        s << ",\"z\":" << pt.Z();
+        s << ",\"kx\":" << dir.X();
+        s << ",\"ky\":" << dir.Y();
+        s << ",\"kz\":" << dir.Z();
+        s << ",\"R_major\":" << maR;
+        s << ",\"R_minor\":" << miR;
+        s << "}";
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
+      break;
+      }
+      case (GeomAbs_Parabola):
+      {
+        gp_Parab pa = w.Parabola();
+        const gp_Ax2 ax =	pa.Position();
+        const Standard_Real f =	pa.Focal();
+        const gp_Dir dir =	ax.Direction();
+        const gp_Pnt pt =	ax.Location();
+        s << "{\"Type\":\"Parabola\"";
+        s << ",\"x\":" << pt.X();
+        s << ",\"y\":" << pt.Y();
+        s << ",\"z\":" << pt.Z();
+        s << ",\"kx\":" << dir.X();
+        s << ",\"ky\":" << dir.Y();
+        s << ",\"kz\":" << dir.Z();
+        s << ",\"Focal\":" << f;
+        s << "}";
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
+      break;
+      }
+      case (GeomAbs_BezierCurve):
+      {
+        occHandle(Geom_BezierCurve) bezier = w.Bezier();
+        const TColgp_Array1OfPnt poles = bezier->Poles();
+        TColStd_Array1OfReal Weights;
+        bezier->Weights(Weights);
+        s << "{\"Type\":\"BezierCurve\",";
+        s << "\"Poles\":[";
+         for (Standard_Integer i = poles.Lower(); i <= poles.Upper(); i++){
+          if (i != 1)
+            s << ",";
+          gp_Pnt pole = poles.Value(i);
+          s << "{\"x\":" << pole.X() << ",\"y\":" << pole.Y() << ",\"z\":" << pole.Z() <<"}";
+         }
+         s << "],";
+         s << "\"Weights\":[";
+         for (Standard_Integer i = Weights.Lower(); i <= Weights.Upper(); i++){
+          if (i != 1)
+            s << ",";
+          s << Weights.Value(i);
+         }
+         s << "]";
+        s << "}";
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  s.str().c_str());
+      break;
+      }
+      case (GeomAbs_BSplineCurve):
+      {
+        occHandle(Geom_BSplineCurve) bspline = w.BSpline();
+        const TColgp_Array1OfPnt poles = bspline->Poles();
+        TColStd_Array1OfReal Weights;
+        bspline->Weights(Weights);
+        s << "{\"Type\":\"BSplineCurve\",";
+        s << "\"Poles\":[";
+         for (Standard_Integer i = poles.Lower(); i <= poles.Upper(); i++){
+          if (i != 1)
+            s << ",";
+          gp_Pnt pole = poles.Value(i);
+          s << "{\"x\":" << pole.X() << ",\"y\":" << pole.Y() << ",\"z\":" << pole.Z() <<"}";
+         }
+         s << "],";
+         s << "\"Weights\":[";
+         for (Standard_Integer i = Weights.Lower(); i <= Weights.Upper(); i++){
+          if (i != 1)
+            s << ",";
+          s << Weights.Value(i);
+         }
+         s << "],";
+        const TColStd_Array1OfReal Knots = bspline->Knots();
+        s << "\"Knots\":[";
+         for (Standard_Integer i = Knots.Lower(); i <= Knots.Upper(); i++){
+           if (i != 1)
+            s << ",";
+          s << Knots.Value(i);
+         }
+         s << "],";
+        const TColStd_Array1OfInteger Multiplicities = bspline->Multiplicities();
+        s << "\"Mults\":[";
+         for (Standard_Integer i = Multiplicities.Lower(); i <= Multiplicities.Upper(); i++){
+           if (i != 1)
+            s << ",";
+          s << Multiplicities.Value(i);
+         }
+         s << "],";
+        Standard_Integer Degree = bspline->Degree();
+         s << "\"Degree\":"<< Degree<<",";
+        Standard_Boolean Periodic=bspline->IsPeriodic();
+         s << "\"Periodic\":"<< Periodic<<",";
+        Standard_Boolean CheckRational=bspline->IsRational();
+         s << "\"Rational\":"<< CheckRational;
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  s.str().c_str());
+      break;
+      }
+      case (GeomAbs_OffsetCurve):
+      {
+        occHandle(Geom_OffsetCurve) oc = w.OffsetCurve();
+        const Standard_Real offset =	oc->Offset();
+        const gp_Dir dir =	oc->Direction();
+        const GeomAbs_Shape  c0chk = oc->Continuity();
+        const occHandle(Geom_Curve) Basis = oc->BasisCurve();
+        s << "{\"Type\":\"OffsetCurve\"";
+        s << ",\"Basis\":" << "\"Error WIP\"";//Basis->DumpJson();
+        s << ",\"kx\":" << dir.X();
+        s << ",\"ky\":" << dir.Y();
+        s << ",\"kz\":" << dir.Z();
+        s << ",\"Offset\":" << offset;
+        s << ",\"Continuity\":" << c0chk;
+        s << "}";
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
+      break;
+      }
+      case (GeomAbs_OtherCurve):
+        //Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "OtherCurve");
+      break;
+    }
+
+  } CATCH_AND_RETHROW_NO_RETURN("Failed to find Edge Type ");
+  return scope.Escape(Type);
+}
+
 int Edge::createCircle(const gp_Pnt& center, const gp_Dir& normal, double radius)
 {
   try {
@@ -390,6 +599,7 @@ void Edge::Init(v8::Local<v8::Object> target)
   Base::InitProto(proto);
 
   EXPOSE_METHOD(Edge, getVertices);
+  EXPOSE_METHOD(Face,getTypeJSON);
 
   EXPOSE_READ_ONLY_PROPERTY_DOUBLE(Edge, length);
   EXPOSE_READ_ONLY_PROPERTY_INTEGER(Edge, numVertices);
@@ -518,5 +728,13 @@ NAN_METHOD(Edge::getType)
 {
   Edge* pThis = UNWRAP(Edge);
   v8::Local<v8::String> Type = pThis->getType();
+  info.GetReturnValue().Set(Type);
+}
+
+NAN_METHOD(Edge::getTypeJSON)
+{
+  Edge* pThis = UNWRAP(Edge);
+  v8::Local<v8::Object>  Type = v8::Local<v8::Object>::Cast(v8::JSON::Parse(v8::Isolate::GetCurrent()->GetCurrentContext(),  pThis->getTypeJSON()).ToLocalChecked());
+  //v8::Local<v8::String>  Type = pThis->getTypeJSON();
   info.GetReturnValue().Set(Type);
 }

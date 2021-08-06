@@ -274,7 +274,8 @@ v8::Local<v8::String> Face::getTypeJSON()
         Standard_Real A,B,C,D;
         //A * X + B * Y + C * Z + D = 0.
         surface.Plane().Coefficients(A,B,C,D);
-        s << "{\"A\":" << A;
+        s << "{\"Type\":\"Plane\",";
+        s << "\"A\":" << A;
         s << ",\"B\":" << B;
         s << ",\"C\":" << C;
         s << ",\"D\":" << D << "}";
@@ -286,7 +287,8 @@ v8::Local<v8::String> Face::getTypeJSON()
       {
         Standard_Real A1,A2,A3,B1,B2,B3,C1,C2,C3,D;
         surface.Cylinder().Coefficients(A1,A2,A3,B1,B2,B3,C1,C2,C3,D);
-        s << "{\"A1\":" << A1;
+        s << "{\"Type\":\"Cylinder\",";
+        s << "\"A1\":" << A1;
         s << ",\"A2\":" << A2;
         s << ",\"A3\":" << A3;
         s << ",\"B1\":" << B1;
@@ -306,7 +308,8 @@ v8::Local<v8::String> Face::getTypeJSON()
       {
         Standard_Real A1,A2,A3,B1,B2,B3,C1,C2,C3,D;
         surface.Cone().Coefficients(A1,A2,A3,B1,B2,B3,C1,C2,C3,D);
-        s << "{\"A1\":" << A1;
+        s << "{\"Type\":\"Cone\",";
+        s << "\"A1\":" << A1;
         s << ",\"A2\":" << A2;
         s << ",\"A3\":" << A3;
         s << ",\"B1\":" << B1;
@@ -324,7 +327,8 @@ v8::Local<v8::String> Face::getTypeJSON()
       {
         Standard_Real A1,A2,A3,B1,B2,B3,C1,C2,C3,D;
         surface.Sphere().Coefficients(A1,A2,A3,B1,B2,B3,C1,C2,C3,D);
-        s << "{\"A1\":" << A1;
+        s << "{\"Type\":\"Sphere\",";
+        s << "\"A1\":" << A1;
         s << ",\"A2\":" << A2;
         s << ",\"A3\":" << A3;
         s << ",\"B1\":" << B1;
@@ -373,7 +377,7 @@ v8::Local<v8::String> Face::getTypeJSON()
         const TColgp_Array2OfPnt poles = bezier->Poles();
         TColStd_Array2OfReal Weights;
         bezier->Weights(Weights);
-        s << "{";
+        s << "{\"Type\":\"BezierSurface\",";
         s << "\"Poles\":[";
          for (Standard_Integer i = poles.LowerRow(); i <= poles.UpperRow(); i++){
           if (i != 1)
@@ -405,7 +409,7 @@ v8::Local<v8::String> Face::getTypeJSON()
       {
          occHandle(Geom_BSplineSurface) bspline = surface.BSpline();
          //The Spline Data:
-         s << "{";
+         s << "{\"Type\":\"BSplineSurface\",";
          s << "\"Poles\":[";
          const TColgp_Array2OfPnt poles = bspline->Poles();
          for (Standard_Integer i = poles.LowerRow(); i <= poles.UpperRow(); i++){

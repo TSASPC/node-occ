@@ -186,6 +186,15 @@
 #include <gp_Torus.hxx>
 #include <Geom_BSplineSurface.hxx>
 #include <Geom_BezierSurface.hxx>
+//Curve Geometries
+#include <gp_Lin.hxx>
+#include <gp_Circ.hxx>
+#include <gp_Elips.hxx>
+#include <gp_Hypr.hxx>
+#include <gp_Parab.hxx>
+#include <Geom_BezierCurve.hxx>
+#include <Geom_BSplineCurve.hxx>
+#include <Geom_OffsetCurve.hxx>
 
 // Compatibility 6.5 and above
 #if (OCC_VERSION_MAJOR * 10 + OCC_VERSION_MINOR )  < 66
