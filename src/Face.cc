@@ -277,10 +277,12 @@ v8::Local<v8::String> Face::getTypeJSON()
         const gp_Ax3& Pos = c.Position();
         const gp_XYZ& XDir = Pos.XDirection().XYZ();
         const gp_XYZ& YDir = Pos.YDirection().XYZ();
+        const gp_XYZ& ZDir = Pos.Direction ().XYZ();
         const gp_XYZ& PLoc = Pos.Location  ().XYZ();
         s << "{\"Type\":\"Plane\"";
         s << ",\"XDir\":{\"x\":" << XDir.X() <<",\"y\":" << XDir.Y() << ",\"z\":" << XDir.Z()<<"}";
         s << ",\"YDir\":{\"x\":" << YDir.X() <<",\"y\":" << YDir.Y() << ",\"z\":" << YDir.Z()<<"}";
+        s << ",\"ZDir\":{\"x\":" << ZDir.X() <<",\"y\":" << ZDir.Y() << ",\"z\":" << ZDir.Z()<<"}";
         s << ",\"PLoc\":{\"x\":" << PLoc.X() <<",\"y\":" << PLoc.Y() << ",\"z\":" << PLoc.Z()<<"}";
         s << "}";
         Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
