@@ -180,6 +180,7 @@
 #include <TColStd_Array1OfReal.hxx>
 
 //Surface Geometries
+#include <gp_Pln.hxx>
 #include <gp_Cylinder.hxx>
 #include <gp_Cone.hxx>
 #include <gp_Sphere.hxx>

@@ -273,31 +273,36 @@ v8::Local<v8::String> Face::getTypeJSON()
       {
         Standard_Real A,B,C,D;
         //A * X + B * Y + C * Z + D = 0.
-        surface.Plane().Coefficients(A,B,C,D);
-        s << "{\"Type\":\"Plane\",";
-        s << "\"A\":" << A;
-        s << ",\"B\":" << B;
-        s << ",\"C\":" << C;
-        s << ",\"D\":" << D << "}";
+        gp_Pln c = surface.Plane();
+        const gp_Ax3& Pos = c.Position();
+        const gp_XYZ& XDir = Pos.XDirection().XYZ();
+        const gp_XYZ& YDir = Pos.YDirection().XYZ();
+        const gp_XYZ& PLoc = Pos.Location  ().XYZ();
+        s << "{\"Type\":\"Plane\"";
+        s << ",\"XDir\":{\"x\":" << XDir.X() <<"\"y\":" << XDir.Y() << "\"z\":" << XDir.Z()<<"}";
+        s << ",\"YDir\":{\"x\":" << YDir.X() <<"\"y\":" << YDir.Y() << "\"z\":" << YDir.Z()<<"}";
+        s << ",\"PLoc\":{\"x\":" << PLoc.X() <<"\"y\":" << PLoc.Y() << "\"z\":" << PLoc.Z()<<"}";
+        s << "}";
         Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
       
       break;
       }
       case (GeomAbs_Cylinder):
       {
-        Standard_Real A1,A2,A3,B1,B2,B3,C1,C2,C3,D;
-        surface.Cylinder().Coefficients(A1,A2,A3,B1,B2,B3,C1,C2,C3,D);
-        s << "{\"Type\":\"Cylinder\",";
-        s << "\"A1\":" << A1;
-        s << ",\"A2\":" << A2;
-        s << ",\"A3\":" << A3;
-        s << ",\"B1\":" << B1;
-        s << ",\"B2\":" << B2;
-        s << ",\"B3\":" << B3;
-        s << ",\"C1\":" << C1;
-        s << ",\"C2\":" << C2;
-        s << ",\"C3\":" << C3;
-        s << ",\"D\":" << D << "}";
+        gp_Cylinder c = surface.Cylinder();
+        const gp_Ax3& Pos = c.Position();
+        const Standard_Real Radius = c.Radius();
+        const gp_XYZ& XDir = Pos.XDirection().XYZ();
+        const gp_XYZ& YDir = Pos.YDirection().XYZ();
+        const gp_XYZ& ZDir = Pos.Direction ().XYZ();
+        const gp_XYZ& PLoc = Pos.Location  ().XYZ();
+        s << "{\"Type\":\"Cylinder\"";
+        s << ",\"Radius\":" << Radius;
+        s << ",\"XDir\":{\"x\":" << XDir.X() <<"\"y\":" << XDir.Y() << "\"z\":" << XDir.Z()<<"}";
+        s << ",\"YDir\":{\"x\":" << YDir.X() <<"\"y\":" << YDir.Y() << "\"z\":" << YDir.Z()<<"}";
+        s << ",\"ZDir\":{\"x\":" << ZDir.X() <<"\"y\":" << ZDir.Y() << "\"z\":" << ZDir.Z()<<"}";
+        s << ",\"PLoc\":{\"x\":" << PLoc.X() <<"\"y\":" << PLoc.Y() << "\"z\":" << PLoc.Z()<<"}";
+        s << "}";
         // A1.X**2 + A2.Y**2 + A3.Z**2 + 2.(B1.X.Y + B2.X.Z + B3.Y.Z) +
         // 2.(C1.X + C2.Y + C3.Z) + D = 0.0
         Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
@@ -306,38 +311,43 @@ v8::Local<v8::String> Face::getTypeJSON()
       }
       case (GeomAbs_Cone):
       {
-        Standard_Real A1,A2,A3,B1,B2,B3,C1,C2,C3,D;
-        surface.Cone().Coefficients(A1,A2,A3,B1,B2,B3,C1,C2,C3,D);
-        s << "{\"Type\":\"Cone\",";
-        s << "\"A1\":" << A1;
-        s << ",\"A2\":" << A2;
-        s << ",\"A3\":" << A3;
-        s << ",\"B1\":" << B1;
-        s << ",\"B2\":" << B2;
-        s << ",\"B3\":" << B3;
-        s << ",\"C1\":" << C1;
-        s << ",\"C2\":" << C2;
-        s << ",\"C3\":" << C3;
-        s << ",\"D\":" << D << "}";
+        gp_Cone c = surface.Cone();
+        const gp_Ax3& Pos = c.Position();
+        const Standard_Real Radius = c.RefRadius();
+        const Standard_Real SAngle = c.SemiAngle();
+        const gp_XYZ& XDir = Pos.XDirection().XYZ();
+        const gp_XYZ& YDir = Pos.YDirection().XYZ();
+        const gp_XYZ& ZDir = Pos.Direction ().XYZ();
+        const gp_XYZ& PLoc = Pos.Location  ().XYZ();
+        s << "{\"Type\":\"Cone\"";
+        s << ",\"Radius\":" << Radius;
+        s << ",\"SAngle\":" << SAngle;
+        s << ",\"XDir\":{\"x\":" << XDir.X() <<"\"y\":" << XDir.Y() << "\"z\":" << XDir.Z()<<"}";
+        s << ",\"YDir\":{\"x\":" << YDir.X() <<"\"y\":" << YDir.Y() << "\"z\":" << YDir.Z()<<"}";
+        s << ",\"ZDir\":{\"x\":" << ZDir.X() <<"\"y\":" << ZDir.Y() << "\"z\":" << ZDir.Z()<<"}";
+        s << ",\"PLoc\":{\"x\":" << PLoc.X() <<"\"y\":" << PLoc.Y() << "\"z\":" << PLoc.Z()<<"}";
+        s << "}";
       //A1.X**2 + A2.Y**2 + A3.Z**2 + 2.(B1.X.Y + B2.X.Z + B3.Y.Z) + 2.(C1.X + C2.Y + C3.Z) + D = 0.0.
         Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
       break;
       }
       case (GeomAbs_Sphere):
       {
-        Standard_Real A1,A2,A3,B1,B2,B3,C1,C2,C3,D;
-        surface.Sphere().Coefficients(A1,A2,A3,B1,B2,B3,C1,C2,C3,D);
-        s << "{\"Type\":\"Sphere\",";
-        s << "\"A1\":" << A1;
-        s << ",\"A2\":" << A2;
-        s << ",\"A3\":" << A3;
-        s << ",\"B1\":" << B1;
-        s << ",\"B2\":" << B2;
-        s << ",\"B3\":" << B3;
-        s << ",\"C1\":" << C1;
-        s << ",\"C2\":" << C2;
-        s << ",\"C3\":" << C3;
-        s << ",\"D\":" << D << "}";
+        
+        gp_Sphere c = surface.Sphere();
+        const gp_Ax3& Pos = c.Position();
+        const Standard_Real Radius = c.Radius();
+        const gp_XYZ& XDir = Pos.XDirection().XYZ();
+        const gp_XYZ& YDir = Pos.YDirection().XYZ();
+        const gp_XYZ& ZDir = Pos.Direction ().XYZ();
+        const gp_XYZ& PLoc = Pos.Location  ().XYZ();
+        s << "{\"Type\":\"Sphere\"";
+        s << ",\"Radius\":" << Radius;
+        s << ",\"XDir\":{\"x\":" << XDir.X() <<"\"y\":" << XDir.Y() << "\"z\":" << XDir.Z()<<"}";
+        s << ",\"YDir\":{\"x\":" << YDir.X() <<"\"y\":" << YDir.Y() << "\"z\":" << YDir.Z()<<"}";
+        s << ",\"ZDir\":{\"x\":" << ZDir.X() <<"\"y\":" << ZDir.Y() << "\"z\":" << ZDir.Z()<<"}";
+        s << ",\"PLoc\":{\"x\":" << PLoc.X() <<"\"y\":" << PLoc.Y() << "\"z\":" << PLoc.Z()<<"}";
+        s << "}";
         //A1.X**2 + A2.Y**2 + A3.Z**2 + 2.(B1.X.Y + B2.X.Z + B3.Y.Z) +
         //2.(C1.X + C2.Y + C3.Z) + D = 0.0
         Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
@@ -345,13 +355,23 @@ v8::Local<v8::String> Face::getTypeJSON()
       }
       case (GeomAbs_Torus):
       {
-        TColStd_Array1OfReal    Coeffs  (1,35);
-        surface.Torus().Coefficients(Coeffs);
-       s << "{";
-       for (int i = 1; i < 36; i++){
-         s << "\"C"<< i <<"\":" << Coeffs.Value(i);
-       }
-       s << "}";
+        
+        gp_Torus c = surface.Torus();
+        const gp_Ax3& Pos = c.Position();
+        const Standard_Real R_major = c.MajorRadius();
+        const Standard_Real R_minor = c.MinorRadius();
+        const gp_XYZ& XDir = Pos.XDirection().XYZ();
+        const gp_XYZ& YDir = Pos.YDirection().XYZ();
+        const gp_XYZ& ZDir = Pos.Direction ().XYZ();
+        const gp_XYZ& PLoc = Pos.Location  ().XYZ();
+        s << "{\"Type\":\"Torus\"";
+        s << ",\"R_major\":" << R_major;
+        s << ",\"R_minor\":" << R_minor;
+        s << ",\"XDir\":{\"x\":" << XDir.X() <<"\"y\":" << XDir.Y() << "\"z\":" << XDir.Z()<<"}";
+        s << ",\"YDir\":{\"x\":" << YDir.X() <<"\"y\":" << YDir.Y() << "\"z\":" << YDir.Z()<<"}";
+        s << ",\"ZDir\":{\"x\":" << ZDir.X() <<"\"y\":" << ZDir.Y() << "\"z\":" << ZDir.Z()<<"}";
+        s << ",\"PLoc\":{\"x\":" << PLoc.X() <<"\"y\":" << PLoc.Y() << "\"z\":" << PLoc.Z()<<"}";
+        s << "}";
         /*
         Coef(1) * X^4 + Coef(2) * Y^4 + Coef(3) * Z^4 +
         Coef(4) * X^3 * Y + Coef(5) * X^3 * Z + Coef(6) * Y^3 * X +
@@ -442,7 +462,7 @@ v8::Local<v8::String> Face::getTypeJSON()
           s << "]";
          }
          s << "],";
-         const TColStd_Array1OfReal UKnots = bspline->UKnots();
+         const TColStd_Array1OfReal UKnots = bspline->UKnotSequence();
          s << "\"UKnots\":[";
          for (Standard_Integer i = UKnots.Lower(); i <= UKnots.Upper(); i++){
            if (i != 1)
@@ -450,7 +470,7 @@ v8::Local<v8::String> Face::getTypeJSON()
           s << UKnots.Value(i);
          }
          s << "],";
-         const TColStd_Array1OfReal VKnots = bspline->VKnots();
+         const TColStd_Array1OfReal VKnots = bspline->VKnotSequence();
          s << "\"VKnots\":[";
          for (Standard_Integer i = VKnots.Lower(); i <= VKnots.Upper(); i++){
            if (i != 1)
@@ -458,7 +478,7 @@ v8::Local<v8::String> Face::getTypeJSON()
           s << VKnots.Value(i);
          }
          s << "],";
-         const TColStd_Array1OfInteger UMults = bspline->UMultiplicities();
+         /*const TColStd_Array1OfInteger UMults = bspline->UMultiplicities();
          s << "\"UMults\":[";
          for (Standard_Integer i = UMults.Lower(); i <= UMults.Upper(); i++){
            if (i != 1)
@@ -473,7 +493,7 @@ v8::Local<v8::String> Face::getTypeJSON()
             s << ",";
           s << VMults.Value(i);
          }
-         s << "],";
+         s << "],";*/
          const Standard_Integer UDegree = bspline->UDegree();
          s << "\"UDegree\":"<< UDegree<<",";
          const Standard_Integer VDegree = bspline->VDegree();

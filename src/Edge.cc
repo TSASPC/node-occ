@@ -314,7 +314,7 @@ v8::Local<v8::String> Edge::getTypeJSON()
           s << Weights.Value(i);
          }
          s << "],";
-        const TColStd_Array1OfReal Knots = bspline->Knots();
+        const TColStd_Array1OfReal Knots = bspline->KnotSequence();
         s << "\"Knots\":[";
          for (Standard_Integer i = Knots.Lower(); i <= Knots.Upper(); i++){
            if (i != 1)
@@ -322,6 +322,7 @@ v8::Local<v8::String> Edge::getTypeJSON()
           s << Knots.Value(i);
          }
          s << "],";
+         /*
         const TColStd_Array1OfInteger Multiplicities = bspline->Multiplicities();
         s << "\"Mults\":[";
          for (Standard_Integer i = Multiplicities.Lower(); i <= Multiplicities.Upper(); i++){
@@ -329,7 +330,7 @@ v8::Local<v8::String> Edge::getTypeJSON()
             s << ",";
           s << Multiplicities.Value(i);
          }
-         s << "],";
+         s << "],";*/
         Standard_Integer Degree = bspline->Degree();
          s << "\"Degree\":"<< Degree<<",";
         Standard_Boolean Periodic=bspline->IsPeriodic();

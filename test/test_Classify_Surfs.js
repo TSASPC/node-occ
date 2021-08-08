@@ -13,9 +13,11 @@ occ.readSTEP("Sphere.step", function (err, shapes) {
             for (let k = 0; k < wires.length; k++){
                 const edges = wires[k].getEdges();
                 console.log(k)
+                console.log(wires[k].getVertices())
                 for (let l = 0; l < edges.length; l++){
                     console.log(edges[l].getType())
-                    console.log(edges[l].getTypeJSON())
+                    console.log(edges[l].getVertices())
+                    //console.log(edges[l].getTypeJSON())
                     
                 }
             }
