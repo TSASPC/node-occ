@@ -33,7 +33,8 @@ public:
   virtual void InitNew(_NAN_METHOD_ARGS);
 
   v8::Local<v8::Object> createMesh(double factor, double angle, bool qualityNormals = true);
-
+  v8::Local<v8::String> getLocation();
+  v8::Local<v8::String> getRotation();
   typedef enum BoolOpType {
     BOOL_FUSE,
     BOOL_CUT,
@@ -68,6 +69,8 @@ public:
 
   static NAN_METHOD(New);
   static NAN_METHOD(NewInstance);
+  static NAN_METHOD(getLocation);
+  static NAN_METHOD(getRotation);
 
   static v8::Local<v8::Value>     NewInstance(TopoDS_Shape shape);
   static v8::Local<v8::Value>     NewInstance();

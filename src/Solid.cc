@@ -37,6 +37,8 @@ void Solid::Init(v8::Local<v8::Object> target)
   EXPOSE_METHOD(Solid,getAdjacentFaces);
   EXPOSE_METHOD(Solid,getCommonEdges);	
   EXPOSE_METHOD(Solid,createMesh);
+  EXPOSE_METHOD(Solid,getLocation);
+  EXPOSE_METHOD(Solid,getRotation);
 
 
   EXPOSE_READ_ONLY_PROPERTY_DOUBLE (Solid,area);
@@ -64,6 +66,7 @@ NAN_METHOD(Solid::InitNew)
   REXPOSE_READ_ONLY_PROPERTY_INTEGER(Solid,numShells);
   REXPOSE_READ_ONLY_PROPERTY_BOOLEAN(Solid,hasMesh);
 }
+
 
 
 NAN_METHOD(Solid::New)
@@ -140,6 +143,21 @@ NAN_METHOD(Solid::NewInstance)
   info.GetReturnValue().Set(NewInstance(shape));
 }
 
+NAN_METHOD(Solid::getLocation)
+{
+  Solid* pThis = UNWRAP(Solid);
+  v8::Local<v8::Object>  Type = v8::Local<v8::Object>::Cast(v8::JSON::Parse(v8::Isolate::GetCurrent()->GetCurrentContext(),  pThis->getLocation()).ToLocalChecked());
+  //v8::Local<v8::String>  Type = pThis->getTypeJSON();
+  info.GetReturnValue().Set(Type);
+}
+
+NAN_METHOD(Solid::getRotation)
+{
+  Solid* pThis = UNWRAP(Solid);
+  v8::Local<v8::Object>  Type = v8::Local<v8::Object>::Cast(v8::JSON::Parse(v8::Isolate::GetCurrent()->GetCurrentContext(),  pThis->getRotation()).ToLocalChecked());
+  //v8::Local<v8::String>  Type = pThis->getTypeJSON();
+  info.GetReturnValue().Set(Type);
+}
 
 NAN_METHOD(Solid::getEdges)
 {
@@ -412,6 +430,31 @@ bool Solid::hasMesh() {
 //    return ret;
 //}
 
+v8::Local<v8::String> Solid::getLocation()
+{
+  const TopLoc_Location aShapeLocation = this->shape().Location();
+  gp_Trsf aTransformation = aShapeLocation.Transformation();
+  //aTransformation.Invert();
+  const gp_XYZ & XDir = aTransformation.TranslationPart();
+
+  std::stringstream s;
+  s << "{\"x\":" << XDir.X() <<",\"y\":" << XDir.Y() << ",\"z\":" << XDir.Z()<<"}";
+  v8::Local<v8::String> Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str()).ToLocalChecked();
+  return Type;
+}
+
+v8::Local<v8::String> Solid::getRotation()
+{
+  const TopLoc_Location aShapeLocation = this->shape().Location();
+  gp_Trsf aTransformation = aShapeLocation.Transformation();
+  //aTransformation.Invert();
+  gp_Quaternion q = aTransformation.GetRotation();
+
+  std::stringstream s;
+  s << "{\"w\":" << q.W() <<",\"x\":" << q.X() <<",\"y\":" << q.Y() << ",\"z\":" << q.Z()<<"}";
+  v8::Local<v8::String> Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str()).ToLocalChecked();
+  return Type;
+}
 
 NAN_PROPERTY_GETTER(Solid::_mesh)
 {

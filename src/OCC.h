@@ -197,6 +197,10 @@
 #include <Geom_BSplineCurve.hxx>
 #include <Geom_OffsetCurve.hxx>
 
+// Transformations:
+#include <gp_Trsf.hxx>
+#include <gp_Quaternion.hxx>
+
 // Compatibility 6.5 and above
 #if (OCC_VERSION_MAJOR * 10 + OCC_VERSION_MINOR )  < 66
 
