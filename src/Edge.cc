@@ -117,7 +117,7 @@ int Edge::createArc3P(Vertex *start, Vertex *end, const gp_Pnt& aPoint)
 v8::Local<v8::String> Edge::getType()
 {
   Nan::EscapableHandleScope scope;
-  v8::Local<v8::String> Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "NaN");
+  v8::Local<v8::String> Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "NaN").ToLocalChecked();
 
   const TopoDS_Edge& edge = this->edge();
 
@@ -126,31 +126,31 @@ v8::Local<v8::String> Edge::getType()
     switch(w.GetType())
     {
       case (GeomAbs_Line):
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "Line");
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "Line").ToLocalChecked();
       break;
       case (GeomAbs_Circle):
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "Circle");
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "Circle").ToLocalChecked();
       break;
       case (GeomAbs_Ellipse):
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "Ellipse");
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "Ellipse").ToLocalChecked();
       break;
       case (GeomAbs_Hyperbola):
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "Hyperbola");
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "Hyperbola").ToLocalChecked();
       break;
       case (GeomAbs_Parabola):
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "Parabola");
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "Parabola").ToLocalChecked();
       break;
       case (GeomAbs_BezierCurve):
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "BezierCurve");
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "BezierCurve").ToLocalChecked();
       break;
       case (GeomAbs_BSplineCurve):
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "BSplineCurve");
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "BSplineCurve").ToLocalChecked();
       break;
       case (GeomAbs_OffsetCurve):
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "OffsetCurve");
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "OffsetCurve").ToLocalChecked();
       break;
       case (GeomAbs_OtherCurve):
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "OtherCurve");
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "OtherCurve").ToLocalChecked();
       break;
     }
 
@@ -161,7 +161,7 @@ v8::Local<v8::String> Edge::getType()
 v8::Local<v8::String> Edge::getTypeJSON()
 {
   Nan::EscapableHandleScope scope;
-  v8::Local<v8::String> Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "NaN");
+  v8::Local<v8::String> Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "NaN").ToLocalChecked();
 
   const TopoDS_Edge& edge = this->edge();
 
@@ -183,7 +183,7 @@ v8::Local<v8::String> Edge::getTypeJSON()
         s << ",\"ky\":" << dir.Y();
         s << ",\"kz\":" << dir.Z();
         s << "}";
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str()).ToLocalChecked();
       break;
       }
       case (GeomAbs_Circle):
@@ -202,7 +202,7 @@ v8::Local<v8::String> Edge::getTypeJSON()
         s << ",\"kz\":" << dir.Z();
         s << ",\"R\":" << R;
         s << "}";
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str()).ToLocalChecked();
       break;
       }
       case (GeomAbs_Ellipse):
@@ -223,7 +223,7 @@ v8::Local<v8::String> Edge::getTypeJSON()
         s << ",\"R_major\":" << maR;
         s << ",\"R_minor\":" << miR;
         s << "}";
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str()).ToLocalChecked();
       break;
       }
       case (GeomAbs_Hyperbola):
@@ -244,7 +244,7 @@ v8::Local<v8::String> Edge::getTypeJSON()
         s << ",\"R_major\":" << maR;
         s << ",\"R_minor\":" << miR;
         s << "}";
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str()).ToLocalChecked();
       break;
       }
       case (GeomAbs_Parabola):
@@ -263,7 +263,7 @@ v8::Local<v8::String> Edge::getTypeJSON()
         s << ",\"kz\":" << dir.Z();
         s << ",\"Focal\":" << f;
         s << "}";
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str()).ToLocalChecked();
       break;
       }
       case (GeomAbs_BezierCurve):
@@ -289,7 +289,7 @@ v8::Local<v8::String> Edge::getTypeJSON()
          }
          s << "]";
         s << "}";
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  s.str().c_str());
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  s.str().c_str()).ToLocalChecked();
       break;
       }
       case (GeomAbs_BSplineCurve):
@@ -338,7 +338,7 @@ v8::Local<v8::String> Edge::getTypeJSON()
         Standard_Boolean CheckRational=bspline->IsRational();
          s << "\"Rational\":"<< CheckRational;
          s << "}";
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  s.str().c_str());
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  s.str().c_str()).ToLocalChecked();
       break;
       }
       case (GeomAbs_OffsetCurve):
@@ -356,7 +356,7 @@ v8::Local<v8::String> Edge::getTypeJSON()
         s << ",\"Offset\":" << offset;
         s << ",\"Continuity\":" << c0chk;
         s << "}";
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str()).ToLocalChecked();
       break;
       }
       case (GeomAbs_OtherCurve):

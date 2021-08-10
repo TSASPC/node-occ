@@ -210,7 +210,7 @@ v8::Local<v8::Object> Face::createMesh(double factor, double angle, bool quality
 v8::Local<v8::String> Face::getType()
 {
   Nan::EscapableHandleScope scope;
-  v8::Local<v8::String> Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "NaN");
+  v8::Local<v8::String> Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "NaN").ToLocalChecked();
 
   const TopoDS_Face& face = this->face();
 
@@ -219,37 +219,37 @@ v8::Local<v8::String> Face::getType()
     switch(surface.GetType())
     {
       case (GeomAbs_Plane):
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "Plane");
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "Plane").ToLocalChecked();
       break;
       case (GeomAbs_Cylinder):
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "Cylinder");
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "Cylinder").ToLocalChecked();
       break;
       case (GeomAbs_Cone):
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "Cone");
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "Cone").ToLocalChecked();
       break;
       case (GeomAbs_Sphere):
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "Sphere");
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "Sphere").ToLocalChecked();
       break;
       case (GeomAbs_Torus):
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "Torus");
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "Torus").ToLocalChecked();
       break;
       case (GeomAbs_BezierSurface):
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "BezierSurface");
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "BezierSurface").ToLocalChecked();
       break;
       case (GeomAbs_BSplineSurface):
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "BSplineSurface");
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "BSplineSurface").ToLocalChecked();
       break;
       case (GeomAbs_SurfaceOfRevolution):
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "SurfaceOfRevolution");
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "SurfaceOfRevolution").ToLocalChecked();
       break;
       case (GeomAbs_SurfaceOfExtrusion):
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "SurfaceOfExtrusion");
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "SurfaceOfExtrusion").ToLocalChecked();
       break;
       case (GeomAbs_OffsetSurface):
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "OffsetSurface");
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "OffsetSurface").ToLocalChecked();
       break;
       case (GeomAbs_OtherSurface):
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "OtherSurface");
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  "OtherSurface").ToLocalChecked();
       break;
     }
 
@@ -260,7 +260,7 @@ v8::Local<v8::String> Face::getType()
 v8::Local<v8::String> Face::getTypeJSON()
 {
   Nan::EscapableHandleScope scope;
-  v8::Local<v8::String> Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "{err:\"Not Supported\"}");
+  v8::Local<v8::String> Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "{err:\"Not Supported\"}").ToLocalChecked();
 
   const TopoDS_Face& face = this->face();
 
@@ -285,7 +285,7 @@ v8::Local<v8::String> Face::getTypeJSON()
         s << ",\"ZDir\":{\"x\":" << ZDir.X() <<",\"y\":" << ZDir.Y() << ",\"z\":" << ZDir.Z()<<"}";
         s << ",\"PLoc\":{\"x\":" << PLoc.X() <<",\"y\":" << PLoc.Y() << ",\"z\":" << PLoc.Z()<<"}";
         s << "}";
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str()).ToLocalChecked();
       
       break;
       }
@@ -307,7 +307,7 @@ v8::Local<v8::String> Face::getTypeJSON()
         s << "}";
         // A1.X**2 + A2.Y**2 + A3.Z**2 + 2.(B1.X.Y + B2.X.Z + B3.Y.Z) +
         // 2.(C1.X + C2.Y + C3.Z) + D = 0.0
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str()).ToLocalChecked();
       
       break;
       }
@@ -330,7 +330,7 @@ v8::Local<v8::String> Face::getTypeJSON()
         s << ",\"PLoc\":{\"x\":" << PLoc.X() <<",\"y\":" << PLoc.Y() << ",\"z\":" << PLoc.Z()<<"}";
         s << "}";
       //A1.X**2 + A2.Y**2 + A3.Z**2 + 2.(B1.X.Y + B2.X.Z + B3.Y.Z) + 2.(C1.X + C2.Y + C3.Z) + D = 0.0.
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str()).ToLocalChecked();
       break;
       }
       case (GeomAbs_Sphere):
@@ -352,7 +352,7 @@ v8::Local<v8::String> Face::getTypeJSON()
         s << "}";
         //A1.X**2 + A2.Y**2 + A3.Z**2 + 2.(B1.X.Y + B2.X.Z + B3.Y.Z) +
         //2.(C1.X + C2.Y + C3.Z) + D = 0.0
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str()).ToLocalChecked();
       break;
       }
       case (GeomAbs_Torus):
@@ -390,7 +390,7 @@ v8::Local<v8::String> Face::getTypeJSON()
         Coef(32) * X + Coef(33) * Y + Coef(34) *  Z + 
         Coef(35) = 0.0
         */
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str());
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str()).ToLocalChecked();
       break;
       }
       case (GeomAbs_BezierSurface):
@@ -424,7 +424,7 @@ v8::Local<v8::String> Face::getTypeJSON()
          }
          s << "]";
         s << "}";
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  s.str().c_str());
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  s.str().c_str()).ToLocalChecked();
       break;
       }
       case (GeomAbs_BSplineSurface):
@@ -505,7 +505,7 @@ v8::Local<v8::String> Face::getTypeJSON()
          const Standard_Boolean VPeriodic = bspline->IsVPeriodic();
          s << "\"VPeriodic\":"<< VPeriodic;
          s << "}";
-        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  s.str().c_str());
+        Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(),  s.str().c_str()).ToLocalChecked();
       break;
       }
       //These will need work in their JSON Rep.
