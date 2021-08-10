@@ -279,7 +279,7 @@ v8::Local<v8::String> Face::getTypeJSON()
         const gp_XYZ& YDir = Pos.YDirection().XYZ();
         const gp_XYZ& ZDir = Pos.Direction ().XYZ();
         const gp_XYZ& PLoc = Pos.Location  ().XYZ();
-        s << "{\"Type\":\"Plane\"";
+        s << "{\"class\":\"Plane\"";
         s << ",\"XDir\":{\"x\":" << XDir.X() <<",\"y\":" << XDir.Y() << ",\"z\":" << XDir.Z()<<"}";
         s << ",\"YDir\":{\"x\":" << YDir.X() <<",\"y\":" << YDir.Y() << ",\"z\":" << YDir.Z()<<"}";
         s << ",\"ZDir\":{\"x\":" << ZDir.X() <<",\"y\":" << ZDir.Y() << ",\"z\":" << ZDir.Z()<<"}";
@@ -298,7 +298,7 @@ v8::Local<v8::String> Face::getTypeJSON()
         const gp_XYZ& YDir = Pos.YDirection().XYZ();
         const gp_XYZ& ZDir = Pos.Direction ().XYZ();
         const gp_XYZ& PLoc = Pos.Location  ().XYZ();
-        s << "{\"Type\":\"Cylinder\"";
+        s << "{\"class\":\"Cylinder\"";
         s << ",\"Radius\":" << Radius;
         s << ",\"XDir\":{\"x\":" << XDir.X() <<",\"y\":" << XDir.Y() << ",\"z\":" << XDir.Z()<<"}";
         s << ",\"YDir\":{\"x\":" << YDir.X() <<",\"y\":" << YDir.Y() << ",\"z\":" << YDir.Z()<<"}";
@@ -321,7 +321,7 @@ v8::Local<v8::String> Face::getTypeJSON()
         const gp_XYZ& YDir = Pos.YDirection().XYZ();
         const gp_XYZ& ZDir = Pos.Direction ().XYZ();
         const gp_XYZ& PLoc = Pos.Location  ().XYZ();
-        s << "{\"Type\":\"Cone\"";
+        s << "{\"class\":\"Cone\"";
         s << ",\"Radius\":" << Radius;
         s << ",\"SAngle\":" << SAngle;
         s << ",\"XDir\":{\"x\":" << XDir.X() <<",\"y\":" << XDir.Y() << ",\"z\":" << XDir.Z()<<"}";
@@ -343,7 +343,7 @@ v8::Local<v8::String> Face::getTypeJSON()
         const gp_XYZ& YDir = Pos.YDirection().XYZ();
         const gp_XYZ& ZDir = Pos.Direction ().XYZ();
         const gp_XYZ& PLoc = Pos.Location  ().XYZ();
-        s << "{\"Type\":\"Sphere\"";
+        s << "{\"class\":\"Sphere\"";
         s << ",\"Radius\":" << Radius;
         s << ",\"XDir\":{\"x\":" << XDir.X() <<",\"y\":" << XDir.Y() << ",\"z\":" << XDir.Z()<<"}";
         s << ",\"YDir\":{\"x\":" << YDir.X() <<",\"y\":" << YDir.Y() << ",\"z\":" << YDir.Z()<<"}";
@@ -366,7 +366,7 @@ v8::Local<v8::String> Face::getTypeJSON()
         const gp_XYZ& YDir = Pos.YDirection().XYZ();
         const gp_XYZ& ZDir = Pos.Direction ().XYZ();
         const gp_XYZ& PLoc = Pos.Location  ().XYZ();
-        s << "{\"Type\":\"Torus\"";
+        s << "{\"class\":\"Torus\"";
         s << ",\"R_major\":" << R_major;
         s << ",\"R_minor\":" << R_minor;
         s << ",\"XDir\":{\"x\":" << XDir.X() <<",\"y\":" << XDir.Y() << ",\"z\":" << XDir.Z()<<"}";
@@ -399,7 +399,7 @@ v8::Local<v8::String> Face::getTypeJSON()
         const TColgp_Array2OfPnt poles = bezier->Poles();
         TColStd_Array2OfReal Weights;
         bezier->Weights(Weights);
-        s << "{\"Type\":\"BezierSurface\",";
+        s << "{\"class\":\"BezierSurface\",";
         s << "\"Poles\":[";
          for (Standard_Integer i = poles.LowerRow(); i <= poles.UpperRow(); i++){
           if (i != 1)
@@ -431,7 +431,7 @@ v8::Local<v8::String> Face::getTypeJSON()
       {
          occHandle(Geom_BSplineSurface) bspline = surface.BSpline();
          //The Spline Data:
-         s << "{\"Type\":\"BSplineSurface\",";
+         s << "{\"class\":\"BSplineSurface\",";
          s << "\"Poles\":[";
          const TColgp_Array2OfPnt poles = bspline->Poles();
          for (Standard_Integer i = poles.LowerRow(); i <= poles.UpperRow(); i++){

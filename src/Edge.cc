@@ -175,7 +175,7 @@ v8::Local<v8::String> Edge::getTypeJSON()
         gp_Lin line = w.Line();
         const gp_Dir dir =	line.Direction();
         const gp_Pnt pt =	line.Location();
-        s << "{\"Type\":\"Line\"";
+        s << "{\"class\":\"Line\"";
         s << ",\"x\":" << pt.X();
         s << ",\"y\":" << pt.Y();
         s << ",\"z\":" << pt.Z();
@@ -193,7 +193,7 @@ v8::Local<v8::String> Edge::getTypeJSON()
         const Standard_Real R =	circ.Radius();
         const gp_Dir dir =	ax.Direction();
         const gp_Pnt pt =	ax.Location();
-        s << "{\"Type\":\"Circle\"";
+        s << "{\"class\":\"Circle\"";
         s << ",\"x\":" << pt.X();
         s << ",\"y\":" << pt.Y();
         s << ",\"z\":" << pt.Z();
@@ -213,7 +213,7 @@ v8::Local<v8::String> Edge::getTypeJSON()
         const Standard_Real miR =	el.MinorRadius();
         const gp_Dir dir =	ax.Direction();
         const gp_Pnt pt =	ax.Location();
-        s << "{\"Type\":\"Ellipse\"";
+        s << "{\"class\":\"Ellipse\"";
         s << ",\"x\":" << pt.X();
         s << ",\"y\":" << pt.Y();
         s << ",\"z\":" << pt.Z();
@@ -234,7 +234,7 @@ v8::Local<v8::String> Edge::getTypeJSON()
         const Standard_Real miR =	hy.MinorRadius();
         const gp_Dir dir =	ax.Direction();
         const gp_Pnt pt =	ax.Location();
-        s << "{\"Type\":\"Hyperbola\"";
+        s << "{\"class\":\"Hyperbola\"";
         s << ",\"x\":" << pt.X();
         s << ",\"y\":" << pt.Y();
         s << ",\"z\":" << pt.Z();
@@ -254,7 +254,7 @@ v8::Local<v8::String> Edge::getTypeJSON()
         const Standard_Real f =	pa.Focal();
         const gp_Dir dir =	ax.Direction();
         const gp_Pnt pt =	ax.Location();
-        s << "{\"Type\":\"Parabola\"";
+        s << "{\"class\":\"Parabola\"";
         s << ",\"x\":" << pt.X();
         s << ",\"y\":" << pt.Y();
         s << ",\"z\":" << pt.Z();
@@ -272,7 +272,7 @@ v8::Local<v8::String> Edge::getTypeJSON()
         const TColgp_Array1OfPnt poles = bezier->Poles();
         TColStd_Array1OfReal Weights;
         bezier->Weights(Weights);
-        s << "{\"Type\":\"BezierCurve\",";
+        s << "{\"class\":\"BezierCurve\",";
         s << "\"Poles\":[";
          for (Standard_Integer i = poles.Lower(); i <= poles.Upper(); i++){
           if (i != 1)
@@ -298,7 +298,7 @@ v8::Local<v8::String> Edge::getTypeJSON()
         const TColgp_Array1OfPnt poles = bspline->Poles();
         TColStd_Array1OfReal Weights;
         bspline->Weights(Weights);
-        s << "{\"Type\":\"BSplineCurve\",";
+        s << "{\"class\":\"BSplineCurve\",";
         s << "\"Poles\":[";
          for (Standard_Integer i = poles.Lower(); i <= poles.Upper(); i++){
           if (i != 1)
@@ -348,7 +348,7 @@ v8::Local<v8::String> Edge::getTypeJSON()
         const gp_Dir dir =	oc->Direction();
         const GeomAbs_Shape  c0chk = oc->Continuity();
         const occHandle(Geom_Curve) Basis = oc->BasisCurve();
-        s << "{\"Type\":\"OffsetCurve\"";
+        s << "{\"class\":\"OffsetCurve\"";
         s << ",\"Basis\":" << "\"Error WIP\"";//Basis->DumpJson();
         s << ",\"kx\":" << dir.X();
         s << ",\"ky\":" << dir.Y();
