@@ -266,6 +266,10 @@ v8::Local<v8::String> Face::getTypeJSON()
 
   try {
     BRepAdaptor_Surface surface(face);
+    const Standard_Real u0 = surface.FirstUParameter();
+    const Standard_Real u1 = surface.LastUParameter();
+    const Standard_Real v0 = surface.FirstVParameter();
+    const Standard_Real v1 = surface.LastVParameter(); 
     std::stringstream s;
     switch(surface.GetType())
     {
@@ -284,6 +288,10 @@ v8::Local<v8::String> Face::getTypeJSON()
         s << ",\"YDir\":{\"x\":" << YDir.X() <<",\"y\":" << YDir.Y() << ",\"z\":" << YDir.Z()<<"}";
         s << ",\"ZDir\":{\"x\":" << ZDir.X() <<",\"y\":" << ZDir.Y() << ",\"z\":" << ZDir.Z()<<"}";
         s << ",\"PLoc\":{\"x\":" << PLoc.X() <<",\"y\":" << PLoc.Y() << ",\"z\":" << PLoc.Z()<<"}";
+        s << ",\"u0\":"<<u0;
+        s << ",\"u1\":"<<u1;
+        s << ",\"v0\":"<<v0;
+        s << ",\"v1\":"<<v1;
         s << "}";
         Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str()).ToLocalChecked();
       
@@ -304,6 +312,10 @@ v8::Local<v8::String> Face::getTypeJSON()
         s << ",\"YDir\":{\"x\":" << YDir.X() <<",\"y\":" << YDir.Y() << ",\"z\":" << YDir.Z()<<"}";
         s << ",\"ZDir\":{\"x\":" << ZDir.X() <<",\"y\":" << ZDir.Y() << ",\"z\":" << ZDir.Z()<<"}";
         s << ",\"PLoc\":{\"x\":" << PLoc.X() <<",\"y\":" << PLoc.Y() << ",\"z\":" << PLoc.Z()<<"}";
+        s << ",\"u0\":"<<u0;
+        s << ",\"u1\":"<<u1;
+        s << ",\"v0\":"<<v0;
+        s << ",\"v1\":"<<v1;
         s << "}";
         // A1.X**2 + A2.Y**2 + A3.Z**2 + 2.(B1.X.Y + B2.X.Z + B3.Y.Z) +
         // 2.(C1.X + C2.Y + C3.Z) + D = 0.0
@@ -328,6 +340,10 @@ v8::Local<v8::String> Face::getTypeJSON()
         s << ",\"YDir\":{\"x\":" << YDir.X() <<",\"y\":" << YDir.Y() << ",\"z\":" << YDir.Z()<<"}";
         s << ",\"ZDir\":{\"x\":" << ZDir.X() <<",\"y\":" << ZDir.Y() << ",\"z\":" << ZDir.Z()<<"}";
         s << ",\"PLoc\":{\"x\":" << PLoc.X() <<",\"y\":" << PLoc.Y() << ",\"z\":" << PLoc.Z()<<"}";
+        s << ",\"u0\":"<<u0;
+        s << ",\"u1\":"<<u1;
+        s << ",\"v0\":"<<v0;
+        s << ",\"v1\":"<<v1;
         s << "}";
       //A1.X**2 + A2.Y**2 + A3.Z**2 + 2.(B1.X.Y + B2.X.Z + B3.Y.Z) + 2.(C1.X + C2.Y + C3.Z) + D = 0.0.
         Type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), s.str().c_str()).ToLocalChecked();
@@ -349,6 +365,10 @@ v8::Local<v8::String> Face::getTypeJSON()
         s << ",\"YDir\":{\"x\":" << YDir.X() <<",\"y\":" << YDir.Y() << ",\"z\":" << YDir.Z()<<"}";
         s << ",\"ZDir\":{\"x\":" << ZDir.X() <<",\"y\":" << ZDir.Y() << ",\"z\":" << ZDir.Z()<<"}";
         s << ",\"PLoc\":{\"x\":" << PLoc.X() <<",\"y\":" << PLoc.Y() << ",\"z\":" << PLoc.Z()<<"}";
+        s << ",\"u0\":"<<u0;
+        s << ",\"u1\":"<<u1;
+        s << ",\"v0\":"<<v0;
+        s << ",\"v1\":"<<v1;
         s << "}";
         //A1.X**2 + A2.Y**2 + A3.Z**2 + 2.(B1.X.Y + B2.X.Z + B3.Y.Z) +
         //2.(C1.X + C2.Y + C3.Z) + D = 0.0
@@ -373,6 +393,10 @@ v8::Local<v8::String> Face::getTypeJSON()
         s << ",\"YDir\":{\"x\":" << YDir.X() <<",\"y\":" << YDir.Y() << ",\"z\":" << YDir.Z()<<"}";
         s << ",\"ZDir\":{\"x\":" << ZDir.X() <<",\"y\":" << ZDir.Y() << ",\"z\":" << ZDir.Z()<<"}";
         s << ",\"PLoc\":{\"x\":" << PLoc.X() <<",\"y\":" << PLoc.Y() << ",\"z\":" << PLoc.Z()<<"}";
+        s << ",\"u0\":"<<u0;
+        s << ",\"u1\":"<<u1;
+        s << ",\"v0\":"<<v0;
+        s << ",\"v1\":"<<v1;
         s << "}";
         /*
         Coef(1) * X^4 + Coef(2) * Y^4 + Coef(3) * Z^4 +
