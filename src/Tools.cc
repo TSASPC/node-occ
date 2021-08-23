@@ -790,6 +790,8 @@ NAN_METHOD(writeGLTF)
     BRepMesh_IncrementalMesh anAlgo;
     //anAlgo.ChangeParameters().Deflection = Prs3d::GetDeflection (aCompound, aDrawer);
     anAlgo.ChangeParameters().Angle      = 20.0 * M_PI / 180.0; // 20 degrees
+    anAlgo.ChangeParameters().Deflection               = 0.01;
+    anAlgo.ChangeParameters().MinSize               = 0.01;
     anAlgo.ChangeParameters().InParallel = true;
     anAlgo.SetShape (aCompound);
     anAlgo.Perform();
