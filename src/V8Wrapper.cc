@@ -75,9 +75,12 @@ void Initialize(v8::Local<v8::Object> target)
     Nan::SetMethod(target,"writeSTL",      writeSTL);
     Nan::SetMethod(target,"writeSTEP",     writeSTEP);
     Nan::SetMethod(target,"writeBREP",     writeBREP);
+    Nan::SetMethod(target,"writeGLTF",     writeGLTF);
     Nan::SetMethod(target,"readSTEP",      readSTEP);
     Nan::SetMethod(target,"readBREP",      readBREP);
-    Nan::SetMethod(target,"writeGLTF", writeGLTF);
+    Nan::SetMethod(target,"writeParasolid", writeParasolid);
+    Nan::SetMethod(target,"readParasolid", readParasolid);
+    Nan::SetMethod(target,"convertParasolid2GLTF", convertParasolid2GLTF);
 
     //xx Nan::SetMethod(target,"oceVersion",NanNew("0.13"));
     Nan::Set(target,Nan::New("oceVersion").ToLocalChecked(),  Nan::New("1.0.1").ToLocalChecked());

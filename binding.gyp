@@ -69,6 +69,7 @@
                       "include_dirs": [
                       "/usr/local/include",
                       "/usr/local/include/opencascade",
+                      "/usr/local/include/cadex",
                       "<!(node -e \"require('nan')\")"
                       ],}
               ],
@@ -198,7 +199,14 @@
         "-lTKXmlTObj",
         "-lTKXmlXCAF",
         "-lTKXSBase",
-        "-lTKXSDRAW"
+        "-lTKXSDRAW",
+        "-Wl,--as-needed "
+        "-lCadExCore",
+        "-lCadExGLTF",
+        "-lCadExBRep",
+        "-lCadExCreo",
+        "-lCadExPara",
+        "-Wl,--no-as-needed"
       ],
       "other_libraries": [
         "-lTKTObj",

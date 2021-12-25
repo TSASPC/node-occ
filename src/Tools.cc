@@ -9,6 +9,33 @@
 #include <sstream>
 #include "AsyncWorkerWithProgress.h"
 
+//Checkout:
+//https://docs.cadexchanger.com/sdk/exploring_2brepgeometry_2main_8cxx-example.html
+#include <iostream>
+
+#ifdef CADEXCHANGER 
+  //Note you will need to put the Licence into the CADEX include Folder
+  #include <cadex/cadex_license.cxx>
+
+  #include <cadex/Base_String.hxx>
+  #include <cadex/LicenseManager_Activate.h>
+  #include <cadex/ModelData_Model.hxx>
+  #include <cadex/ModelData_ModelWriter.hxx>
+  #include <cadex/STEP_Reader.hxx>
+  #include <cadex/STEP_ReaderParameters.hxx>
+  #include <cadex/Para_Reader.hxx>
+  #include <cadex/Para_Writer.hxx>
+  #include <cadex/GLTF_Writer.hxx>
+  #include <cadex/ModelData_ShapeConverter.hxx>
+  #include <cadex/ModelData_Model.hxx>
+  #include <cadex/ModelData_Shape.hxx>
+  #include <cadex/ModelData_SceneGraphElement.hxx>
+  
+  using namespace cadex;
+//SOLIDWORKS
+//#include <cadex/SDL_Reader.hxx>
+#endif
+
 //
 // ref : http://nikhilm.github.io/uvbook/threads.html
 //
@@ -735,7 +762,168 @@ NAN_METHOD(readBREP)
   info.GetReturnValue().SetUndefined();
 }
 
+#ifdef CADEXCHANGER
 
+class ParasolidAsyncReadWorker : public StepBrepAsyncReadWorker {
+public:
+  ParasolidAsyncReadWorker(Nan::Callback *callback, Nan::Callback* progressCallback, std::string* pfilename)
+    : StepBrepAsyncReadWorker(callback, progressCallback, pfilename)
+  {
+  }
+  ~ParasolidAsyncReadWorker() {
+
+  }
+
+  void Execute();
+
+};
+
+
+void ParasolidAsyncReadWorker::Execute()
+{
+
+  this->_retValue = 0;
+
+  std::string filename = this->_filename;
+
+  try {
+    //occHandle(Message_ProgressIndicator) progress = new MyProgressIndicator(this);
+    //progress->SetScale(1, 100, 1);
+    //progress->Show();
+
+    // read parasolid-file
+    auto aKey = cadex::LicenseKey::Value();
+
+    // Activate the license (aKey must be defined in cadex_license.cxx)
+    if (!CADExLicense_Activate (aKey)) {
+        std::stringstream str;
+        str << "Failed to activate CAD Exchanger license." <<  std::ends;
+        this->SetErrorMessage(str.str().c_str());
+        this->_retValue = 1;
+    }
+    cadex::Para_Reader aReader;
+    TopoDS_Shape aShape;
+    if (!aReader.ReadFile (filename.c_str()) || !aReader.Transfer (aShape)) 
+    {
+      
+      std::stringstream str;
+      str << "1- cannot read Parasolid file : '" << filename << "'" << std::ends;
+      this->SetErrorMessage(str.str().c_str());
+      this->_retValue = 1;
+
+      //progress->SetValue(100.0);
+      //progress->Show();
+      return;
+    }
+    this->shapes.push_back(aShape);
+    //progress->SetValue(100.0);
+    //progress->Show();
+  }
+  catch (...) {
+    this->SetErrorMessage("2 ( caught C++ exception in _readParasolidAsync");
+    this->_retValue = 2;
+    return;
+  }
+}
+
+
+  void readParasolidAsync(const std::string& filename, v8::Local<v8::Function> _callback, v8::Local<v8::Function> _progressCallback)
+  {
+    Nan::Callback* callback = new Nan::Callback(_callback);
+    Nan::Callback* progressCallback = _progressCallback.IsEmpty() ? nullptr : new Nan::Callback(_progressCallback);
+    std::string* pfilename = new std::string(filename);
+
+    Nan::AsyncQueueWorker(new ParasolidAsyncReadWorker(callback, progressCallback, pfilename));
+
+  }
+  NAN_METHOD(readParasolid)
+  {
+
+    std::string filename;
+    if (!extractFileName(info[0], filename)) {
+      return Nan::ThrowError("expecting a file name");
+    }
+    v8::Local<v8::Function> callback;
+    if (!extractCallback(info[1], callback)) {
+      return Nan::ThrowError("expecting a callback function");
+    }
+    v8::Local<v8::Function> progressCallback;
+    if (!extractCallback(info[2], progressCallback)) {
+      // OPTIONAL !!!
+      // return Nan::ThrowError("expecting a callback function");
+    }
+    readParasolidAsync(filename, callback, progressCallback);
+
+    info.GetReturnValue().SetUndefined();
+  }
+
+NAN_METHOD(writeParasolid)
+{
+  std::string filename;
+  if (!extractFileName(info[0], filename)) {
+    return Nan::ThrowError("expecting a file name");
+  }
+  std::list<Shape*>  shapes;
+  for (int i = 1; i < info.Length(); i++) {
+    extractShapes(info[i], shapes);
+  }
+  if (shapes.size() == 0) {
+    info.GetReturnValue().Set(Nan::New<v8::Boolean>(false));
+    return;
+  }
+
+  try {
+    auto aKey = cadex::LicenseKey::Value();
+
+    // Activate the license (aKey must be defined in cadex_license.cxx)
+    if (!CADExLicense_Activate (aKey)) {
+        return Nan::ThrowError("Failed to activate CAD Exchanger license.");
+    }
+    cadex::ModelData_Model aModel;
+    cadex::Para_Writer aWriter;
+    for (std::list<Shape*>::iterator it = shapes.begin(); it != shapes.end(); it++) {
+      TopoDS_Shape shape = (*it)->shape();
+      cadex::ModelData_ShapeConverter::Add (shape, aModel);
+    }
+    if (!aWriter.Transfer (aModel) || !aWriter.WriteFile (filename.c_str())) {
+        //some error happened
+        return Nan::ThrowError("Error in Parasolid Write!");
+    }
+  } CATCH_AND_RETHROW("Failed to write Parasolid file ");
+  info.GetReturnValue().Set(Nan::New<v8::Boolean>(true));
+}
+NAN_METHOD(convertParasolid2GLTF)
+{
+  std::string inputfilename;
+  if (!extractFileName(info[0], inputfilename)) {
+    return Nan::ThrowError("expecting an input file name");
+  }
+  std::string outputfilename;
+  if (!extractFileName(info[1], outputfilename)) {
+    return Nan::ThrowError("expecting an output file name");
+  }
+
+  try {
+    auto aKey = cadex::LicenseKey::Value();
+
+    // Activate the license (aKey must be defined in cadex_license.cxx)
+    if (!CADExLicense_Activate (aKey)) {
+        return Nan::ThrowError("Failed to activate CAD Exchanger license.");
+    }
+    cadex::ModelData_Model aModel;
+    cadex::Para_Reader aParasolidReader;
+    aParasolidReader.ReadFile (inputfilename.c_str()) && aParasolidReader.Transfer (aModel);
+    cadex::GLTF_Writer aWriter;
+    if (!aWriter.Transfer (aModel) || !aWriter.WriteFile (outputfilename.c_str())) {
+        //some error happened
+        return Nan::ThrowError("Error in Parasolid Write!");
+    }
+  } CATCH_AND_RETHROW("Failed to write Parasolid file ");
+  info.GetReturnValue().Set(Nan::New<v8::Boolean>(true));
+}
+
+#endif
+//#ifndef CADEXCHANGER
 NAN_METHOD(writeGLTF)
 {
   std::string filename;
