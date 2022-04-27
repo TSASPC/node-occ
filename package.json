@@ -1,10 +1,10 @@
 {
   "name": "@tsaspc/node-occ",
-  "version": "1.0.15",
+  "version": "1.0.17",
   "description": "OpenCascade OCCT Wrapper for Node js",
   "preferGlobal": true,
   "dependencies": {
-    "async": "^3.2.0",
+    "async": "^3.2.3",
     "colors": "*",
     "gettemporaryfilepath": "1.0.1",
     "nan": "^2.14.1",

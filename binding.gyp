@@ -6,6 +6,7 @@
   "targets": [
     {
       "target_name": "occ",
+      "defines": [ "NO_CADEX" ],
       "cflags!": [ "-fno-exceptions" ],
       "cflags_cc!": [ "-fno-exceptions" ],
          "conditions": [
@@ -69,7 +70,7 @@
                       "include_dirs": [
                       "/usr/local/include",
                       "/usr/local/include/opencascade",
-                      "/usr/local/include/cadex",
+                      # "/usr/local/include/cadex",
                       "<!(node -e \"require('nan')\")"
                       ],}
               ],
