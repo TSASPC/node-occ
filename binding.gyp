@@ -6,9 +6,13 @@
   "targets": [
     {
       "target_name": "occ",
-      "defines": [ "NO_CADEX" ],
-      "cflags!": [ "-fno-exceptions" ],
-      "cflags_cc!": [ "-fno-exceptions" ],
+      "defines": [
+        "OCE_HAVE_IOMANIP",
+        "OCE_HAVE_IOSTREAM",
+        "OCE_HAVE_CLIMITS",
+        "NO_CADEX",
+        "NO_PAID"
+      ],
          "conditions": [
               [
                 "OS=='mac'",
@@ -36,33 +40,40 @@
               [
                 "OS=='linux'",
                 {
-                      "cflags!": [
-                        "-fno-exceptions"
-                      ],
-                      "cflags_cc!": [
-                        "-fno-exceptions"
-                      ],
+
                       "cflags": [
                         "-O3",
+                        "-w",
+                        "-fPIC",
+                        "-frtti",
+                        "-fexceptions",
                         "-frtti",
                         "-Wno-ignored-qualifiers",
                         "-Wno-unused-variable",
                         "-Wno-reorder",
-                        "-Wno-extra"
+                        "-Wno-extra"#,
+                        #"-fpermissive"
                       ],
                       "cflags_cc": [
                         "-O3",
+                        "-std=c++0x",
+                        "-w",
+                        "-fPIC",
+                        "-frtti",
+                        "-fexceptions",
                         "-frtti",
                         "-Wno-ignored-qualifiers",
                         "-Wno-unused-variable",
                         "-Wno-reorder",
-                        "-Wno-extra"
+                        "-Wall",
+                        "-Wno-extra"#,
+                        #"-fpermissive"
                       ],
                       "ldflags": [
                         "-Wl,-rpath,\$$ORIGIN"
                         ],
                         'xcode_settings': {
-                          'OTHER_CPLUSPLUSFLAGS': ['-std=c++11', '-stdlib=libc++'],
+                          'OTHER_CPLUSPLUSFLAGS': ['-std=c++18', '-stdlib=libc++'],
                         },
                       "library_dirs": [
                       "/usr/local/lib",
@@ -70,6 +81,7 @@
                       "include_dirs": [
                       "/usr/local/include",
                       "/usr/local/include/opencascade",
+                      #"/usr/local/include/opencascade/products",
                       # "/usr/local/include/cadex",
                       "<!(node -e \"require('nan')\")"
                       ],}
@@ -135,11 +147,6 @@
         "src/Wire.h",
         "src/Wire.cc",
         "src/V8Wrapper.cc",
-      ],
-      "defines": [
-        "OCE_HAVE_IOMANIP",
-        "OCE_HAVE_IOSTREAM",
-        "OCE_HAVE_CLIMITS"
       ],
       "libraries+": [
 
@@ -207,6 +214,13 @@
         "-lCadExBRep",
         "-lCadExCreo",
         "-lCadExPara",
+        "-Wl,--no-as-needed",
+        "-Wl,--as-needed ",
+        "-lTKOCCLicense",
+        "-lTKXSBase",
+        "-lTKXT",
+        "-lTKXDEXT",
+        "-lTKXSDRAWXT",
         "-Wl,--no-as-needed"
       ],
       "other_libraries": [

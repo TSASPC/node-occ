@@ -1,6 +1,6 @@
 {
   "name": "@tsaspc/node-occ",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "description": "OpenCascade OCCT Wrapper for Node js",
   "preferGlobal": true,
   "dependencies": {
@@ -55,7 +55,6 @@
   "binary": {
     "module_name": "occ",
     "module_path": "./lib/binding/",
-    "host-aws": "https://nodeocc.s3-us-west-1.amazonaws.com",
     "host": "https://github.com/tsaspc/node-occ/releases/download/",
     "remote_path": "{version}"
   },

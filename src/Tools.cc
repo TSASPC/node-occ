@@ -35,6 +35,20 @@
 //SOLIDWORKS
 //#include <cadex/SDL_Reader.hxx>
 #endif
+#ifdef PAID_OCCT
+  //Note you will need to put the Licence into the CADEX include Folder
+  #include <products/OCCLicense_Activate.hxx>
+//SOLIDWORKS
+//#include <cadex/SDL_Reader.hxx>
+#endif
+#ifdef PARASOLID 
+  //Note you will need to put the Licence into the CADEX include Folder
+  
+  //#include <XSControl_Reader.hxx>
+  #include <products/XtControl_Reader.hxx>
+//SOLIDWORKS
+//#include <cadex/SDL_Reader.hxx>
+#endif
 
 //
 // ref : http://nikhilm.github.io/uvbook/threads.html
@@ -458,6 +472,12 @@ void StepAsyncReadWorker::Execute() {
     */
 
     STEPControl_Reader aReader;
+    //TODO:
+    //See https://gitlab.onelab.info/gmsh/gmsh/-/blob/master/src/geo/GModelIO_OCC.cpp 
+    //For reference.
+    //CAF is for Labels + Colors
+    //STEPCAFControl_Reader aReader;
+
 
 
     Interface_Static::SetCVal("xstep.cascade.unit",    "mm");
@@ -465,6 +485,7 @@ void StepAsyncReadWorker::Execute() {
     Interface_Static::SetIVal("read.step.product.mode", 1);
 
     //progress->NewScope(5, "reading");
+      std::cout << " STEP INITIALIZED." << std::endl;
 
     if (aReader.ReadFile(_filename.c_str()) != IFSelect_RetDone) {
 
@@ -482,6 +503,7 @@ void StepAsyncReadWorker::Execute() {
       return;
 
     }
+      std::cout << " STEP READ." << std::endl;
     //progress->EndScope();
     //progress->Show();
 
@@ -493,16 +515,18 @@ void StepAsyncReadWorker::Execute() {
 
     // Root transfers
     int nbr = aReader.NbRootsForTransfer();
+      std::cout << "# Roots: "<< nbr << std::endl;
 
     Standard_Boolean failsonly = Standard_False;
     aReader.PrintCheckTransfer(failsonly, IFSelect_ItemsByEntity);
-
+    
+    std::cout << "PrintCheckTransfer: "<< failsonly << std::endl;
     //progress->SetRange(0, nbr);
     int mod = nbr / 10 + 1;
     for (int n = 1; n <= nbr; n++) {
 
       Standard_Boolean ok = aReader.TransferRoot(n);
-
+      std:: cout << n << std::endl;
       Standard_Integer nbs = aReader.NbShapes();
       if (!ok || nbs == 0) {
         continue; // skip empty root
@@ -511,6 +535,8 @@ void StepAsyncReadWorker::Execute() {
         //progress->Increment(); 
       }
     }
+    //aReader.TransferRoots();
+      std::cout << " STEP Roots Transferred." << std::endl;
 
     //aReader.WS()->MapReader()->SetProgress(0);
   
@@ -522,6 +548,7 @@ void StepAsyncReadWorker::Execute() {
     BRep_Builder B;
     TopoDS_Compound compound;
     B.MakeCompound(compound);
+      std::cout << " STEP Shape Compounded." << std::endl;
 
 
 
@@ -537,6 +564,7 @@ void StepAsyncReadWorker::Execute() {
       B.Add(compound, aShape);
       this->shapes.push_back(aShape);
     }
+      std::cout << " STEP Shapes Pushed." << std::endl;
 
     aResShape = compound;
 
@@ -625,6 +653,7 @@ void StepAsyncReadWorker::Execute() {
       }
       // END: Store names
     }
+      std::cout << " STEP Finalized." << std::endl;
     
   }
   /*catch (OSD_Exception& e) {
@@ -921,6 +950,376 @@ NAN_METHOD(convertParasolid2GLTF)
   } CATCH_AND_RETHROW("Failed to write Parasolid file ");
   info.GetReturnValue().Set(Nan::New<v8::Boolean>(true));
 }
+
+#endif
+#ifdef PARASOLID
+
+class ParasolidAsyncReadWorker : public StepBrepAsyncReadWorker {
+public:
+  ParasolidAsyncReadWorker(Nan::Callback *callback, Nan::Callback* progressCallback, std::string* pfilename)
+    : StepBrepAsyncReadWorker(callback, progressCallback, pfilename)
+  {
+  }
+  ~ParasolidAsyncReadWorker() {
+
+  }
+
+  void Execute();
+
+};
+
+
+void ParasolidAsyncReadWorker::Execute() {
+
+  MutexLocker _locker(stepOperation_mutex);
+
+  void* data = request.data;
+  this->_retValue = 0;
+
+  //occHandle(Message_ProgressRange) progress = new MyProgressIndicator(this);
+
+  //progress->SetScale(1, 100, 1);
+  //progress->Show();
+
+  try {
+   /* occHandle(TDocStd_Document) hDoc;
+    occHandle(XCAFApp_Application) hApp = XCAFApp_Application::GetApplication();
+    hApp->NewDocument(TCollection_ExtendedString("MDTV-XCAF"), hDoc);
+    occHandle(XCAFDoc_ShapeTool) Assembly = XCAFDoc_DocumentTool::ShapeTool (hDoc->Main()); 
+    
+      STEPCAFControl_Reader aReader;
+    Interface_Static::SetCVal("xstep.cascade.unit",    "mm");
+    Interface_Static::SetIVal("read.step.nonmanifold",  1);
+    Interface_Static::SetIVal("read.step.product.mode", 1);
+      aReader.SetColorMode(true);
+      aReader.SetNameMode(true);
+      aReader.SetLayerMode(true);
+      if (aReader.ReadFile((Standard_CString)(_filename.c_str())) != IFSelect_RetDone) {
+
+      std::stringstream str;
+    std::cerr << " (1) cannot read STEP file "  << std::endl;
+    this->SetErrorMessage("2 - caught C++ exception in readStep");
+    this->_retValue = 2;
+
+      // Local<Value> argv[] = { Local<Value>(String::New())  };
+      //  Local<Value>  res =  callback->Call(global, 1, argv);
+      // NanReturnUndefined();
+      //progress->EndScope();
+      //progress->SetValue(105.0);
+      //progress->Show();
+      this->_retValue = 1;
+      return;
+
+    }
+    aReader.Transfer(hDoc);
+
+    TDF_LabelSequence frshapes;
+    Assembly->GetShapes(frshapes);
+    if (frshapes.Length() == 0) {
+      std::stringstream str;
+    std::cerr << " (1) cannot read STEP file "  << std::endl;
+    this->SetErrorMessage("2 - caught C++ exception in readStep (No Data)");
+    this->_retValue = 2;
+    return;
+    } else if (frshapes.Length() == 1) {
+        TopoDS_Shape shape = Assembly->GetShape(frshapes.Value(1));
+                    this->shapes.push_back(shape);
+    } else {
+        for (Standard_Integer i=1; i<frshapes.Length(); i++) {
+            TopoDS_Shape S = Assembly->GetShape(frshapes.Value(i));
+
+            TDF_Label aLabel = Assembly->FindShape(S, Standard_False);
+            if ( (!aLabel.IsNull()) && (Assembly->IsShape(aLabel)) ) {
+                if (Assembly->IsFree(aLabel) ) {
+                    this->shapes.push_back(S);
+                }
+            }
+        }
+    }
+    */
+
+    XtControl_Reader aReader;
+
+
+    Interface_Static::SetCVal("xstep.cascade.unit",    "mm");
+    Interface_Static::SetIVal("read.step.nonmanifold",  1);
+    Interface_Static::SetIVal("read.step.product.mode", 1);
+
+    //progress->NewScope(5, "reading");
+
+    if (aReader.ReadFile(_filename.c_str()) != IFSelect_RetDone) {
+
+      std::stringstream str;
+      str << " (1) cannot read STEP file " << _filename << std::ends;
+      this->SetErrorMessage(str.str().c_str());
+
+      // Local<Value> argv[] = { Local<Value>(String::New())  };
+      //  Local<Value>  res =  callback->Call(global, 1, argv);
+      // NanReturnUndefined();
+      //progress->EndScope();
+      //progress->SetValue(105.0);
+      //progress->Show();
+      this->_retValue = 1;
+      return;
+
+    }
+    //progress->EndScope();
+    //progress->Show();
+
+
+    //progress->NewScope(95, "transfert");
+    //progress->Show();
+    //aReader.WS()->MapReader()->SetProgress(progress);
+
+
+    // Root transfers
+    int nbr = aReader.NbRootsForTransfer();
+
+    Standard_Boolean failsonly = Standard_False;
+    aReader.PrintCheckTransfer(failsonly, IFSelect_ItemsByEntity);
+
+    //progress->SetRange(0, nbr);
+    // int mod = nbr / 10 + 1;
+    // for (int n = 1; n <= nbr; n++) {
+    //   aReader.ClearShapes();
+    //   Standard_Boolean ok = aReader.TransferRoot(n);
+
+    //   Standard_Integer nbs = aReader.NbShapes();
+    //   if (!ok || nbs == 0) {
+    //     continue; // skip empty root
+    //   }
+    //   if ((n + 1) % mod == 0) { 
+    //     //progress->Increment(); 
+    //   }
+    // }
+    aReader.TransferRoots();
+    //aReader.WS()->MapReader()->SetProgress(0);
+  
+    //progress->SetValue(100);
+    //progress->EndScope();
+    //progress->Show();
+
+    TopoDS_Shape aResShape;
+    BRep_Builder B;
+    TopoDS_Compound compound;
+    B.MakeCompound(compound);
+
+
+
+    int nbs = aReader.NbShapes();
+    for (int i = 1; i <= nbs; i++) {
+      const TopoDS_Shape& aShape = aReader.Shape(i);             
+
+
+      if (aShape.ShapeType() == TopAbs_SOLID) {
+        ShapeFix_Solid fix((const TopoDS_Solid&)aShape);
+        fix.Perform();
+      }
+      B.Add(compound, aShape);
+      this->shapes.push_back(aShape);
+    }
+
+    aResShape = compound;
+
+    TopTools_IndexedMapOfShape anIndices;
+    TopExp::MapShapes(aResShape, anIndices);
+
+    occHandle(Interface_InterfaceModel) Model = aReader.WS()->Model();
+    occHandle(XSControl_TransferReader) TR = aReader.WS()->TransferReader();
+
+    if (!TR.IsNull()) {
+      occHandle(Transfer_TransientProcess) TP = TR->TransientProcess();
+      occHandle(Standard_Type) tPD = STANDARD_TYPE(StepBasic_ProductDefinition);
+      occHandle(Standard_Type) tNAUO = STANDARD_TYPE(StepRepr_NextAssemblyUsageOccurrence);
+      occHandle(Standard_Type) tShape = STANDARD_TYPE(StepShape_TopologicalRepresentationItem);
+      occHandle(Standard_Type) tGeom = STANDARD_TYPE(StepGeom_GeometricRepresentationItem);
+
+      Standard_Integer nb = Model->NbEntities();
+
+
+      for (Standard_Integer ie = 1; ie <= nb; ie++) {
+
+        occHandle(Standard_Transient) enti = Model->Value(ie);
+
+        occHandle(TCollection_HAsciiString) aName;
+
+        if (enti->DynamicType() == tNAUO) {
+          occHandle(StepRepr_NextAssemblyUsageOccurrence) NAUO = occHandle(StepRepr_NextAssemblyUsageOccurrence)::DownCast(enti);
+          if (NAUO.IsNull()) continue;
+
+          // Interface_EntityIterator subs = aReader.WS()->Graph().Sharings(NAUO);
+          auto  subs = aReader.WS()->Graph().Sharings(NAUO);
+          for (subs.Start(); subs.More(); subs.Next()) {
+            occHandle(StepRepr_ProductDefinitionShape) PDS = occHandle(StepRepr_ProductDefinitionShape)::DownCast(subs.Value());
+            if (PDS.IsNull()) continue;
+            occHandle(StepBasic_ProductDefinitionRelationship) PDR = PDS->Definition().ProductDefinitionRelationship();
+            if (PDR.IsNull()) continue;
+            if (PDR->HasDescription() && PDR->Description()->Length() > 0) {
+              aName = PDR->Description();
+            }
+            else if (PDR->Name()->Length() > 0) {
+              aName = PDR->Name();
+            }
+            else {
+              aName = PDR->Id();
+            }
+          }
+          // find proper label
+          TCollection_ExtendedString str(aName->String());
+        }
+        else  if (enti->IsKind(tShape) || enti->IsKind(tGeom)) {
+          aName = occHandle(StepRepr_RepresentationItem)::DownCast(enti)->Name();
+        }
+        else if (enti->DynamicType() == tPD) {
+          occHandle(StepBasic_ProductDefinition) PD = occHandle(StepBasic_ProductDefinition)::DownCast(enti);
+          if (PD.IsNull()) continue;
+          occHandle(StepBasic_Product) Prod = PD->Formation()->OfProduct();
+          aName = Prod->Name();
+        }
+        else {
+          continue;
+        }
+        if (aName->UsefullLength() < 1)
+          continue;
+        // skip 'N0NE' name
+        if (aName->UsefullLength() == 4 && toupper(aName->Value(1)) == 'N' &&toupper(aName->Value(2)) == 'O' && toupper(aName->Value(3)) == 'N' && toupper(aName->Value(4)) == 'E')
+          continue;
+        TCollection_ExtendedString aNameExt(aName->ToCString());
+
+        // find target shape
+        occHandle(Transfer_Binder) binder = TP->Find(enti);
+        if (binder.IsNull()) continue;
+
+        TopoDS_Shape S = TransferBRep::ShapeResult(binder);
+        if (S.IsNull()) continue;
+        // as PRODUCT can be included in the main shape
+        // several times, we look here for all inclusions.
+        Standard_Integer isub, nbSubs = anIndices.Extent();
+        for (isub = 1; isub <= nbSubs; isub++) {
+          TopoDS_Shape aSub = anIndices.FindKey(isub);
+          if (aSub.IsPartner(S)) {
+
+            //xx cout << " name of part =" << aName->ToCString() << "  shape " << HashCode(aSub, -1) << " " << aSub.ShapeType() << endl;
+          }
+        }
+
+      }
+      // END: Store names
+    }
+    
+  }
+  /*catch (OSD_Exception& e) {
+      Base::Console().Error("%s\n", e.GetMessageString());
+      Base::Console().Message("Try to load STEP file without colors...\n");
+
+      Part::ImportStepParts(pcDoc,Utf8Name.c_str());
+      pcDoc->recompute();
+  }*/
+  catch (...) {
+    std::cerr << " EXCEPTION in READ STEP" << std::endl;
+    this->SetErrorMessage("2 - caught C++ exception in readStep");
+    this->_retValue = 2;
+    return;
+  }
+
+}
+
+
+
+  void readParasolidAsync(const std::string& filename, v8::Local<v8::Function> _callback, v8::Local<v8::Function> _progressCallback)
+  {
+    Nan::Callback* callback = new Nan::Callback(_callback);
+    Nan::Callback* progressCallback = _progressCallback.IsEmpty() ? nullptr : new Nan::Callback(_progressCallback);
+    std::string* pfilename = new std::string(filename);
+
+    Nan::AsyncQueueWorker(new ParasolidAsyncReadWorker(callback, progressCallback, pfilename));
+
+  }
+  NAN_METHOD(readParasolid)
+  {
+
+    std::string filename;
+    if (!extractFileName(info[0], filename)) {
+      return Nan::ThrowError("expecting a file name");
+    }
+    v8::Local<v8::Function> callback;
+    if (!extractCallback(info[1], callback)) {
+      return Nan::ThrowError("expecting a callback function");
+    }
+    v8::Local<v8::Function> progressCallback;
+    if (!extractCallback(info[2], progressCallback)) {
+      // OPTIONAL !!!
+      // return Nan::ThrowError("expecting a callback function");
+    }
+    readParasolidAsync(filename, callback, progressCallback);
+
+    info.GetReturnValue().SetUndefined();
+  }
+
+// NAN_METHOD(writeParasolid)
+// {
+//   std::string filename;
+//   if (!extractFileName(info[0], filename)) {
+//     return Nan::ThrowError("expecting a file name");
+//   }
+//   std::list<Shape*>  shapes;
+//   for (int i = 1; i < info.Length(); i++) {
+//     extractShapes(info[i], shapes);
+//   }
+//   if (shapes.size() == 0) {
+//     info.GetReturnValue().Set(Nan::New<v8::Boolean>(false));
+//     return;
+//   }
+
+//   try {
+//     auto aKey = cadex::LicenseKey::Value();
+
+//     // Activate the license (aKey must be defined in cadex_license.cxx)
+//     if (!CADExLicense_Activate (aKey)) {
+//         return Nan::ThrowError("Failed to activate CAD Exchanger license.");
+//     }
+//     cadex::ModelData_Model aModel;
+//     cadex::Para_Writer aWriter;
+//     for (std::list<Shape*>::iterator it = shapes.begin(); it != shapes.end(); it++) {
+//       TopoDS_Shape shape = (*it)->shape();
+//       cadex::ModelData_ShapeConverter::Add (shape, aModel);
+//     }
+//     if (!aWriter.Transfer (aModel) || !aWriter.WriteFile (filename.c_str())) {
+//         //some error happened
+//         return Nan::ThrowError("Error in Parasolid Write!");
+//     }
+//   } CATCH_AND_RETHROW("Failed to write Parasolid file ");
+//   info.GetReturnValue().Set(Nan::New<v8::Boolean>(true));
+// }
+// NAN_METHOD(convertParasolid2GLTF)
+// {
+//   std::string inputfilename;
+//   if (!extractFileName(info[0], inputfilename)) {
+//     return Nan::ThrowError("expecting an input file name");
+//   }
+//   std::string outputfilename;
+//   if (!extractFileName(info[1], outputfilename)) {
+//     return Nan::ThrowError("expecting an output file name");
+//   }
+
+//   try {
+//     auto aKey = cadex::LicenseKey::Value();
+
+//     // Activate the license (aKey must be defined in cadex_license.cxx)
+//     if (!CADExLicense_Activate (aKey)) {
+//         return Nan::ThrowError("Failed to activate CAD Exchanger license.");
+//     }
+//     cadex::ModelData_Model aModel;
+//     cadex::Para_Reader aParasolidReader;
+//     aParasolidReader.ReadFile (inputfilename.c_str()) && aParasolidReader.Transfer (aModel);
+//     cadex::GLTF_Writer aWriter;
+//     if (!aWriter.Transfer (aModel) || !aWriter.WriteFile (outputfilename.c_str())) {
+//         //some error happened
+//         return Nan::ThrowError("Error in Parasolid Write!");
+//     }
+//   } CATCH_AND_RETHROW("Failed to write Parasolid file ");
+//   info.GetReturnValue().Set(Nan::New<v8::Boolean>(true));
+// }
 
 #endif
 //#ifndef CADEXCHANGER

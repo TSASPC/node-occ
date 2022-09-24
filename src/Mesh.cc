@@ -132,11 +132,11 @@ int Mesh::extractFaceMesh(const TopoDS_Face& face, bool qualityNormals)
   // ------------------------------------------------------------------------------
   // import face points into index 
   // ------------------------------------------------------------------------------
-  const TColgp_Array1OfPnt&   nodes = triangulation->Nodes();
+  const Poly_ArrayOfNodes&   nodes = triangulation->InternalNodes();//Was s
   Coord3f vert;
   double x, y, z;
   for (int i = 1; i <= nb_points; i++) {
-    const gp_Pnt& pnt = nodes(i);
+    const gp_Pnt& pnt = nodes[i];
     x = pnt.X();
     y = pnt.Y();
     z = pnt.Z();
@@ -163,13 +163,11 @@ int Mesh::extractFaceMesh(const TopoDS_Face& face, bool qualityNormals)
 
     if (triangulation->HasNormals()) {
 
-      const TShort_Array1OfShortReal& normals = triangulation->Normals();
+      const NCollection_Array1< gp_Vec3f >& normals = triangulation->InternalNormals(); //was s
       for (int i = 0; i < nb_points; i++) {
-        const Standard_ShortReal& nx = normals( i*3 + 1);
-        const Standard_ShortReal& ny = normals( i*3 + 2);
-        const Standard_ShortReal& nz = normals( i*3 + 3);
+        const gp_Vec3f& n = normals[i];
 
-        local_normals.push_back(gp_Vec(nx,ny,nz));
+        local_normals.push_back(gp_Vec(n[0],n[1],n[2]));
 
       }
     }
@@ -180,9 +178,9 @@ int Mesh::extractFaceMesh(const TopoDS_Face& face, bool qualityNormals)
 
       if (triangulation->HasUVNodes()) {
 
-        const TColgp_Array1OfPnt2d& uvnodes = triangulation->UVNodes();
+        const Poly_ArrayOfUVNodes& uvnodes = triangulation->InternalUVNodes(); //Was s
         for (int i = 0; i < nb_points; i++) {
-          const gp_Pnt2d& uv = uvnodes(i + 1);
+          const gp_Pnt2d& uv = uvnodes[i + 1];
           double fU = uv.X();
           double fV = uv.Y();
 
@@ -207,7 +205,7 @@ int Mesh::extractFaceMesh(const TopoDS_Face& face, bool qualityNormals)
         for (int i = 0; i < nb_points; i++) {
 
           //------------------------------------------------
-          const gp_Pnt& vertex = nodes(i + 1);
+          const gp_Pnt& vertex = nodes[i + 1];
           GeomAPI_ProjectPointOnSurf SrfProp(vertex, surface);
           
           Standard_Real fU, fV;
@@ -264,9 +262,9 @@ int Mesh::extractFaceMesh(const TopoDS_Face& face, bool qualityNormals)
       continue;
 
     // Calculate face normal
-    const gp_Pnt& P1 = nodes(n1);
-    const gp_Pnt& P2 = nodes(n2);
-    const gp_Pnt& P3 = nodes(n3);
+    const gp_Pnt& P1 = nodes[n1];
+    const gp_Pnt& P2 = nodes[n2];
+    const gp_Pnt& P3 = nodes[n3];
 
     gp_Vec V1(P3.X() - P1.X(), P3.Y() - P1.Y(), P3.Z() - P1.Z());
     if (V1.SquareMagnitude() < 1.0e-10) {
@@ -381,7 +379,7 @@ int Mesh::extractEdge(const TopoDS_Edge& edge, const occHandle(Poly_Triangulatio
 
   this->_edgeRanges.push_back(lastSize);
 
-  const TColStd_Array1OfInteger& edgeind = edgepoly->Nodes();
+  const TColStd_Array1OfInteger& edgeind = edgepoly->Nodes(); //Was S
   for (int i = edgeind.Lower(); i <= edgeind.Upper(); i++) {
     const unsigned int idx = (unsigned int)edgeind(i) - 1;
     this->_edgeIndices.push_back(translationMap[idx]);
